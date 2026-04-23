@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start:dev": "expo start -c",
-    "start:dev:tunnel": "expo start -c --tunnel",
-    "android": "expo start -c --android",
-    "ios": "expo start -c --ios",
-    "web": "expo start -c --web"
+    "start:dev": "NODE_ENV=development expo start -c",
+    "start:dev:tunnel": "NODE_ENV=development expo start -c --tunnel",
+    "start:test": "NODE_ENV=test expo start -c",
+    "start:test:tunnel": "NODE_ENV=test expo start -c --tunnel",
+    "start:prod": "NODE_ENV=production expo start -c",
+    "start:prod:tunnel": "NODE_ENV=production expo start -c --tunnel",
+    "android:dev": "NODE_ENV=development expo start -c --android",
+    "ios:dev": "NODE_ENV=development expo start -c --ios",
+    "web:dev": "NODE_ENV=development expo start -c --web"
   },
   "dependencies": {
     "expo": "~54.0.33",
