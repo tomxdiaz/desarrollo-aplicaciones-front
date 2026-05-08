@@ -1,8 +1,9 @@
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
-export default function App() {
+export default function HomeScreen() {
   const url = `${process.env.EXPO_PUBLIC_API_URL}/restaurant`;
 
   const [restaurants, setRestaurants] = useState([]);
@@ -26,6 +27,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Button title='Ir a Login' onPress={() => router.navigate('/login')} />
+      <Button title='Ir a Register' onPress={() => router.navigate('/register')} />
+
       <Text>Provecho!</Text>
       <Text>URL: {url}</Text>
       {restaurants.map((restaurant: any) => (
