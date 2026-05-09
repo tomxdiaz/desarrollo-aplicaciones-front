@@ -8,15 +8,12 @@ export default function HomeScreen() {
 
   const [restaurants, setRestaurants] = useState([]);
 
-  const [text, setText] = useState('');
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch(url);
         const data = await res.json();
         setRestaurants(data);
-        setText(JSON.stringify(data));
       } catch (error) {
         console.error('Error fetching restaurants:', error);
       }

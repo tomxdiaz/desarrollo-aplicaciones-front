@@ -24,3 +24,7 @@ export const COLORS = {
     informacion: '#2196F3',
   },
 };
+
+export type ColorGroup = keyof typeof COLORS;
+
+export type ColorName<T extends ColorGroup> = keyof (typeof COLORS)[T];

@@ -12,3 +12,5 @@ export const FONT_SIZES = {
   text_base: 16,
   text_small: 14,
 };
+
+export type FontSize = keyof typeof FONT_SIZES;
