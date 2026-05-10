@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "start:dev": "NODE_ENV=development expo start -c",
-    "start:dev:tunnel": "NODE_ENV=development expo start -c --tunnel",
-    "android:dev": "NODE_ENV=development expo start -c --android",
-    "ios:dev": "NODE_ENV=development expo start -c --ios",
-    "web:dev": "NODE_ENV=development expo start -c --web"
+    "start:dev": "npx expo start -c",
+    "start:dev:tunnel": "npx expo start -c --tunnel",
+    "android:dev": "npx expo start -c --android",
+    "ios:dev": "npx expo start -c --ios",
+    "web:dev": "npx expo start -c --web"
   },
   "dependencies": {
     "@expo/vector-icons": "15.0.3",
