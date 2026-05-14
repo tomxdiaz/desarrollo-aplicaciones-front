@@ -1,24 +1,20 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, View } from 'react-native';
+import AuthScreen from './AuthScreen';
+import { supabaseService } from '../../services.ts/supabase.service';
 
 export default function RegisterScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Register Screen</Text>
-
-      <Button title='Ir a Login' onPress={() => router.navigate('/login')} />
-
-      <StatusBar style='auto' />
-    </View>
+    <AuthScreen
+      buttonText='Registrarme'
+      handleAuth={async (email, password) => {
+        await supabaseService.signUp(email, password);
+        router.navigate('/signin');
+      }}
+      alternativeActionText='¿Ya tenes cuenta?'
+      alternativeActionLinkText='Iniciar Sesion'
+      onPressLink={() => router.navigate('/signin')}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -2,9 +2,12 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '../../providers/auth.provider';
 
 export default function HomeScreen() {
   const url = `${process.env.EXPO_PUBLIC_API_URL}/restaurant`;
+
+  const { user, session, loading } = useAuth();
 
   const [restaurants, setRestaurants] = useState([]);
 
@@ -25,6 +28,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <Text>Bienvenido, {user?.email}!</Text>
       <Button title='Ir a Login' onPress={() => router.navigate('/login')} />
       <Button title='Ir a Register' onPress={() => router.navigate('/register')} />
 
