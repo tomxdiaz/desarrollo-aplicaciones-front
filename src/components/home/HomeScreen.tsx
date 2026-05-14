@@ -16,6 +16,7 @@ export default function HomeScreen() {
         setRestaurants(data);
       } catch (error) {
         console.error('Error fetching restaurants:', error);
+        setRestaurants([]);
       }
     };
 

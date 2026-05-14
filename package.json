@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "dev": "npx expo start -c",
+    "dev": "npx expo start -c --tunnel",
     "dev:android": "npx expo start -c --android",
     "dev:ios": "npx expo start -c --ios",
     "dev:web": "npx expo start -c --web"
