@@ -29,8 +29,8 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text>Bienvenido, {user?.email}!</Text>
-      <Button title='Ir a Login' onPress={() => router.navigate('/login')} />
-      <Button title='Ir a Register' onPress={() => router.navigate('/register')} />
+      <Button title='Ir a Login' onPress={() => router.push('/login')} />
+      <Button title='Ir a Register' onPress={() => router.push('/register')} />
 
       <Text>Provecho!</Text>
       <Text>URL: {url}</Text>

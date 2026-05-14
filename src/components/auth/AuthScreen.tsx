@@ -14,7 +14,7 @@ export default function AuthScreen({
   onPressLink,
 }: {
   buttonText: string;
-  handleAuth: (email: string, password: string) => void;
+  handleAuth: (email: string, password: string) => Promise<void>;
   alternativeActionText: string;
   alternativeActionLinkText: string;
   onPressLink: () => void;
