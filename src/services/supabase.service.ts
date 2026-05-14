@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabaseClient';
 
 export const supabaseService = {
   signIn: async (email: string, password: string): Promise<string> => {
-    console.log('Signing up with email:', email, 'and password:', password);
+    console.log('Signing in with email:', email, 'and password:', password);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -10,7 +10,7 @@ export const supabaseService = {
     });
 
     if (!data || error) {
-     
+      console.log(error);
       throw error;
     }
 
@@ -26,7 +26,7 @@ export const supabaseService = {
     });
 
     if (!data || error) {
-      console.log(error)
+      console.log(error);
       throw error;
     }
   },

@@ -29,7 +29,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text>Bienvenido, {user?.email}!</Text>
-      <Button title='Ir a Login' onPress={() => router.push('/login')} />
+      <Button title='Ir a Login' onPress={() => router.push('/signin')} />
       <Button title='Ir a Register' onPress={() => router.push('/register')} />
 
       <Text>Provecho!</Text>

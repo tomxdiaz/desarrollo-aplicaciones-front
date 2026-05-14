@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import AuthScreen from './AuthScreen';
-import { supabaseService } from '../../services.ts/supabase.service';
+import { supabaseService } from '../../services/supabase.service';
 
 export default function RegisterScreen() {
   const handleSignUp = async (email: string, password: string): Promise<void> => {
