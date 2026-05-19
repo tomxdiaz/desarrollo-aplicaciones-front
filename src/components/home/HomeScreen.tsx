@@ -33,8 +33,8 @@ export default function HomeScreen() {
 
       {appUser && <Button title='Cerrar sesión' onPress={signOut} />}
 
-      <Button title='Ir a Login' onPress={() => router.push('/signin')} />
-      <Button title='Ir a Register' onPress={() => router.push('/register')} />
+      <Button title='Ir a Login' onPress={() => router.navigate('/signin')} />
+      <Button title='Ir a Register' onPress={() => router.navigate('/register')} />
 
       <Text>Provecho!</Text>
       {restaurants.map((restaurant: Restaurant) => (

@@ -25,13 +25,13 @@ export default function AuthScreen({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { appUser } = useAuth();
+  const { appUser, loading } = useAuth();
 
   useEffect(() => {
-    if (appUser) {
+    if (appUser && !loading) {
       router.replace('/');
     }
-  }, [appUser]);
+  }, [appUser, loading]);
 
   return (
     <View style={styles.container}>

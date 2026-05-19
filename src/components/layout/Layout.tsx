@@ -5,9 +5,9 @@ import { Redirect, router } from 'expo-router';
 import { useEffect } from 'react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { appUser } = useAuth();
+  const { appUser, loading } = useAuth();
 
-  if (!appUser) {
+  if (!appUser && !loading) {
     return <Redirect href='/signin' />;
   }
 

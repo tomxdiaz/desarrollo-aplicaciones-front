@@ -5,7 +5,7 @@ import { supabaseService } from '../../services/supabase.service';
 export default function SignInScreen() {
   const handleSignIn = async (email: string, password: string) => {
     await supabaseService.signIn(email, password);
-    router.push('/');
+    router.navigate('/');
   };
 
   return (
@@ -15,7 +15,7 @@ export default function SignInScreen() {
       handleAuth={handleSignIn}
       alternativeActionText='¿No tenes cuenta?'
       alternativeActionLinkText='Registrarme'
-      onPressLink={() => router.push('/register')}
+      onPressLink={() => router.navigate('/register')}
     />
   );
 }
