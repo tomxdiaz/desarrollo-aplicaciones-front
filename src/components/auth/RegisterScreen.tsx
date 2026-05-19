@@ -10,6 +10,7 @@ export default function RegisterScreen() {
 
   return (
     <AuthScreen
+      title='Crear Cuenta'
       buttonText='Registrarme'
       handleAuth={handleSignUp}
       alternativeActionText='¿Ya tenes cuenta?'

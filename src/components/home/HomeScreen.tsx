@@ -3,20 +3,19 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../../providers/auth.provider';
+import { restaurantService } from '../../services/restaurant.service';
+import { Restaurant } from '../../types/types';
 
 export default function HomeScreen() {
-  const url = `${process.env.EXPO_PUBLIC_API_URL}/restaurant`;
+  const { appUser, signOut } = useAuth();
 
-  const { user, session, loading } = useAuth();
-
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(url);
-        const data = await res.json();
-        setRestaurants(data);
+        const allRestaurants = await restaurantService.getAllRestaurants();
+        setRestaurants(allRestaurants);
       } catch (error) {
         console.error('Error fetching restaurants:', error);
         setRestaurants([]);
@@ -28,13 +27,17 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Bienvenido, {user?.email}!</Text>
+      {appUser && <Text>Bienvenido, {appUser.email}!</Text>}
+      {appUser && <Text>Tu ID es: {appUser.id}!</Text>}
+      {appUser && <Text>Tenes el rol: {appUser.global_role}!</Text>}
+
+      {appUser && <Button title='Cerrar sesión' onPress={signOut} />}
+
       <Button title='Ir a Login' onPress={() => router.push('/signin')} />
       <Button title='Ir a Register' onPress={() => router.push('/register')} />
 
       <Text>Provecho!</Text>
-      <Text>URL: {url}</Text>
-      {restaurants.map((restaurant: any) => (
+      {restaurants.map((restaurant: Restaurant) => (
         <View key={restaurant.id}>
           <Text>{restaurant.name}</Text>
           <Text>{restaurant.address}</Text>

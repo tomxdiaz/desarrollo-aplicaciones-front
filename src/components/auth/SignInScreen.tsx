@@ -10,6 +10,7 @@ export default function SignInScreen() {
 
   return (
     <AuthScreen
+      title='Iniciar Sesion'
       buttonText='Iniciar Sesion'
       handleAuth={handleSignIn}
       alternativeActionText='¿No tenes cuenta?'
