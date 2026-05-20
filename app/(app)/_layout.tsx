@@ -4,7 +4,12 @@ import Layout from '../../src/components/layout/Layout';
 export default function AppLayout() {
   return (
     <Layout>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack
+        screenOptions={{
+          animation: 'fade',
+          headerShown: false,
+        }}
+      />
     </Layout>
   );
 }

@@ -1,17 +1,13 @@
-export const AppRole = {
-  USER: 'USER',
-  OWNER: 'OWNER',
-  SUPER_USER: 'SUPER_USER',
-} as const;
+export enum AppRoleEnum {
+  SUPER_USER = 'SUPER_USER',
+  OWNER = 'OWNER',
+  USER = 'USER',
+}
 
-export const RestaurantTableStatus = {
-  FREE: 'FREE',
-  OCCUPIED: 'OCCUPIED',
-} as const;
-
-export type AppRoleEnum = (typeof AppRole)[keyof typeof AppRole];
-
-export type RestaurantTableStatusEnum = (typeof RestaurantTableStatus)[keyof typeof RestaurantTableStatus];
+export enum RestaurantTableStatusEnum {
+  FREE = 'FREE',
+  OCCUPIED = 'OCCUPIED',
+}
 
 export type AppUser = {
   id: string;

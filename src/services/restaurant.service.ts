@@ -13,4 +13,10 @@ export const restaurantService = {
       requireAuth: false,
     });
   },
+
+  getMyRestaurants: async () => {
+    return apiClient<Restaurant[]>('/restaurant/me', {
+      requireAuth: true,
+    });
+  },
 };

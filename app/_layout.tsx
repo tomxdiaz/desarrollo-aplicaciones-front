@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AuthProvider } from '../src/providers/auth.provider';
-import { StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 SplashScreen.setOptions({
   duration: 3000,
@@ -12,11 +12,18 @@ SplashScreen.setOptions({
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.safeAreaView}>
-          <Stack screenOptions={{ headerShown: false }} />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} enabled>
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.safeAreaView}>
+            <Stack
+              screenOptions={{
+                animation: 'fade',
+                headerShown: false,
+              }}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </KeyboardAvoidingView>
     </AuthProvider>
   );
 }

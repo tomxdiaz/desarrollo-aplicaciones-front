@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../providers/auth.provider';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { COLORS } from '../../constants/colors';
 import { FONT_SIZES } from '../../constants/font_sizes';
@@ -14,7 +14,7 @@ type DrawerProps = {
 };
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {
-  const { session, appUser, loading, signOut } = useAuth();
+  const { appUser, loading, signOut } = useAuth();
 
   const goTo = (path: string) => {
     onClose();
@@ -36,7 +36,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
             <Text style={styles.logo}>Provecho!</Text>
 
             <Pressable onPress={onClose} style={styles.closeButton}>
-              <AntDesign name='close' size={24} color='black' />
+              <AntDesign name='close' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
             </Pressable>
           </View>
 
@@ -44,53 +44,41 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
             <View style={styles.profileSection}>
               <View style={styles.profileRow}>
                 <View style={styles.avatar}>
-                  {/* <Image source={require('../../assets/profile-placeholder.png')} style={styles.avatarImage} /> */}
-                  <Text>example image</Text>
+                  <MaterialIcons name='person' size={ICON_SIZES.large} color={COLORS.primary.terracota} />
                 </View>
 
                 <View style={styles.profileText}>
-                  {loading ? (
-                    <>
-                      <Text style={styles.userName}>Cargando...</Text>
-                      <Text style={styles.userEmail}>Preparando tu perfil</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.userName}>{appUser?.id ?? 'Usuario'}</Text>
-                      <Text style={styles.userEmail}>{session?.user.email ?? 'Email'}</Text>
-                    </>
-                  )}
+                  <Text style={styles.email}>{loading ? 'Cargando...' : appUser?.email}</Text>
+                  <Text style={styles.role}>{appUser?.global_role}</Text>
                 </View>
               </View>
             </View>
 
             <View style={styles.nav}>
-              <DrawerItem label='Inicio' onPress={() => goTo('/')} />
-              <DrawerItem label='Mis pedidos' onPress={() => goTo('/my-orders')} />
+              <Pressable style={styles.navItem} onPress={() => goTo('/restaurants')}>
+                <Ionicons name='restaurant-outline' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
+                <Text style={styles.navText}>Restaurantes</Text>
+              </Pressable>
+              <Pressable style={styles.navItem} onPress={() => goTo('/my-orders')}>
+                <MaterialCommunityIcons name='newspaper-variant-outline' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
+                <Text style={styles.navText}>Mis Pedidos</Text>
+              </Pressable>
+              <Pressable style={styles.navItem} onPress={() => goTo('/my-restaurants')}>
+                <Ionicons name='storefront-outline' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
+                <Text style={styles.navText}>Mis Restaurantes</Text>
+              </Pressable>
             </View>
           </ScrollView>
 
           <View style={styles.footer}>
             <Pressable style={styles.footerButton} onPress={handleSignOut}>
+              <MaterialIcons name='logout' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
               <Text style={styles.footerButtonText}>Cerrar sesión</Text>
             </Pressable>
           </View>
         </View>
       </View>
     </Modal>
-  );
-}
-
-type DrawerItemProps = {
-  label: string;
-  onPress: () => void;
-};
-
-function DrawerItem({ label, onPress }: DrawerItemProps) {
-  return (
-    <Pressable style={styles.navItem} onPress={onPress}>
-      <Text style={styles.navText}>{label}</Text>
-    </Pressable>
   );
 }
 
@@ -135,11 +123,11 @@ const styles = StyleSheet.create({
   },
 
   closeButton: {
-    width: ICON_SIZES.large,
-    height: ICON_SIZES.large,
+    padding: SPACING.small,
     borderRadius: BORDER_RADIUS.medium,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: `${COLORS.primary.terracota}22`,
   },
 
   content: {
@@ -168,7 +156,7 @@ const styles = StyleSheet.create({
     marginRight: SPACING.medium,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.common.gris_claro,
+    borderColor: `${COLORS.primary.terracota}44`,
   },
 
   avatarImage: {
@@ -179,20 +167,26 @@ const styles = StyleSheet.create({
 
   profileText: {
     flex: 1,
+    display: 'flex',
+    gap: SPACING.extra_small,
   },
 
-  userName: {
-    fontSize: FONT_SIZES.text_small,
-    fontWeight: '700',
-    color: COLORS.common.negro_principal,
-    fontFamily: 'Montserrat',
-  },
-
-  userEmail: {
+  email: {
     marginTop: SPACING.extra_small,
+    fontSize: FONT_SIZES.text_base,
+    color: COLORS.common.gris_oscuro,
+    fontWeight: '500',
+  },
+
+  role: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: SPACING.small,
+    paddingVertical: SPACING.extra_small,
     fontSize: FONT_SIZES.text_small,
     color: COLORS.common.gris_oscuro,
-    fontFamily: 'Work Sans',
+    backgroundColor: `${COLORS.common.gris_medio}22`,
+    fontWeight: '500',
+    borderRadius: BORDER_RADIUS.large,
   },
 
   nav: {
@@ -205,14 +199,16 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.medium,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.common.gris_muy_claro,
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    gap: SPACING.medium,
   },
 
   navText: {
     fontSize: FONT_SIZES.text_base,
     fontWeight: '600',
-    color: COLORS.common.negro_principal,
+    color: COLORS.common.gris_oscuro,
     fontFamily: 'Work Sans',
   },
 
@@ -220,7 +216,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.large,
     paddingVertical: SPACING.medium,
     borderTopWidth: 1,
-    borderTopColor: COLORS.common.gris_claro,
+    borderTopColor: `${COLORS.primary.terracota}44`,
   },
 
   footerButton: {
@@ -229,6 +225,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.primary.terracota,
     backgroundColor: COLORS.common.blanco,
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },

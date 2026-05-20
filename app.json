@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#D1704D"
     },
+    "softwareKeyboardLayoutMode": "adjustResize",
     "ios": {
       "supportsTablet": true
     },
