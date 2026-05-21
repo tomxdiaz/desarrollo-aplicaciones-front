@@ -64,3 +64,10 @@ export type CreateRestaurantPayload = {
   description?: string;
   address?: string;
 };
+
+export type RestaurantStaff = {
+  id: number;
+  user_id: string;
+  restaurant_id: number;
+  role: AppRoleEnum;
+};

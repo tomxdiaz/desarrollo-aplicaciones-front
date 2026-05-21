@@ -24,7 +24,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   }, []);
 
   if (!restaurant) {
-    return;
+    return <Text>El restaurante no existe</Text>;
   }
 
   return (
