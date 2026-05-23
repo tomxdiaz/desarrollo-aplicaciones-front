@@ -1,17 +1,18 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { useEffect, useState } from 'react';
 import { Restaurant } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
+import { Redirect } from 'expo-router';
 
 type RestaurantMenuScreenProps = {
   id: string;
-  table?: string;
+  tableCode?: string;
 };
 
-const RestaurantMenuScreen = ({ id, table }: RestaurantMenuScreenProps) => {
+const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
@@ -39,10 +40,34 @@ const RestaurantMenuScreen = ({ id, table }: RestaurantMenuScreenProps) => {
     );
   }
 
+  if (!loading && !restaurant) {
+    return <Redirect href='/' />
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{restaurant?.name}</Text>
-      {table ? <Text style={styles.tableLabel}>Mesa: {table}</Text> : null}
+      <Text style={styles.title}>{restaurant?.tables?.find((table) => table.code === tableCode)?.capacity} personas</Text>
+      {restaurant?.menu?.categories?.map((category) => {
+        return (
+          <View>
+            <Text>{category.name}</Text>
+            {category.products?.map((p) => {
+              return (
+                <View>
+                  <TouchableOpacity>
+                    <Text>{p.name}</Text>
+                    {tableCode ? (
+                      <TouchableOpacity>
+                        <Text>Agregar</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
+        );
+      })}
     </View>
   );
 };
