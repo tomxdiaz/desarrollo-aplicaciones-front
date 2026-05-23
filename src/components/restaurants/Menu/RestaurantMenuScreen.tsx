@@ -41,21 +41,33 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
   }
 
   if (!loading && !restaurant) {
-    return <Redirect href='/' />
+    return <Redirect href='/restaurants' />;
   }
+
+  console.log('TABLE CODE FROM PARAM:', tableCode);
+  console.log(
+    'FOUND TABLE:',
+    restaurant?.tables?.find((table) => table.code === tableCode),
+  );
+
+  console.log(
+    restaurant?.tables?.map((table) => table.code),
+    ' ',
+    tableCode,
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{restaurant?.tables?.find((table) => table.code === tableCode)?.capacity} personas</Text>
       {restaurant?.menu?.categories?.map((category) => {
         return (
-          <View>
+          <View key={category.id}>
             <Text>{category.name}</Text>
-            {category.products?.map((p) => {
+            {category.products?.map((product) => {
               return (
-                <View>
+                <View key={product.id}>
                   <TouchableOpacity>
-                    <Text>{p.name}</Text>
+                    <Text>{product.name}</Text>
                     {tableCode ? (
                       <TouchableOpacity>
                         <Text>Agregar</Text>
