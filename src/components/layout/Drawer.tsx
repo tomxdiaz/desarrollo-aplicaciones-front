@@ -7,6 +7,7 @@ import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { COLORS } from '../../constants/colors';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { ICON_SIZES } from '../../constants/icon_sizes';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DrawerProps = {
   isOpen: boolean;
@@ -15,6 +16,7 @@ type DrawerProps = {
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {
   const { appUser, loading, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const goTo = (path: string) => {
     onClose();
@@ -28,7 +30,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
 
   return (
     <Modal visible={isOpen} transparent animationType='fade' onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View style={{...styles.overlay, marginTop: insets.top}}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         <View style={styles.drawer}>

@@ -1,5 +1,5 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { Image, StyleSheet, View, Text, Touchable, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, View, Text, Touchable, TouchableOpacity, Pressable } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Drawer } from './Drawer';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { ICON_SIZES } from '../../constants/icon_sizes';
+import { router } from 'expo-router';
 
 SplashScreen.setOptions({
   duration: 3000,
@@ -22,6 +23,12 @@ export default function Header() {
 
   return (
     <View style={styles.header}>
+       <Pressable onPress={()=>{
+        if (router.canGoBack()){
+          router.back()
+        }}}>
+          <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
+        </Pressable>
       <View style={styles.logoTitleContainer}>
         <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
         <View>
