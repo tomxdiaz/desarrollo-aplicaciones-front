@@ -21,7 +21,7 @@ function parseTableCode(code: string) {
 
   return {
     restaurantId: parts[0],
-    tableId: parts[1],
+    tableCode: parts[1],
   };
 }
 
@@ -40,13 +40,13 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
     const parsed = parseTableCode(rawCode);
 
     if (!parsed) {
-      Alert.alert('Invalid code', 'The table code should look like restaurantId/tableId');
+      Alert.alert('Invalid code', 'The table code should look like restaurantId/tableCode');
       return;
     }
 
     router.push({
       pathname: '/restaurants/[id]/menu',
-      params: { id, table: parsed.tableId },
+      params: { id: parsed.restaurantId, table: parsed.tableCode },
     });
   };
 
@@ -181,7 +181,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
             <View style={styles.divider} />
 
             <Pressable style={styles.outlineButton} onPress={openScanner}>
-              <MaterialCommunityIcons name='qrcode-scan' size={ICON_SIZES.small} colo={COLORS.primary.caramelo} />
+              <MaterialCommunityIcons name='qrcode-scan' size={ICON_SIZES.small} color={COLORS.primary.caramelo} />
               <Text style={styles.outlineButtonText}>Escanear QR de la mesa</Text>
             </Pressable>
 

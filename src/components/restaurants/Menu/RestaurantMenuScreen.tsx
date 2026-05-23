@@ -44,20 +44,11 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
     return <Redirect href='/restaurants' />;
   }
 
-  console.log('TABLE CODE FROM PARAM:', tableCode);
-  console.log(
-    'FOUND TABLE:',
-    restaurant?.tables?.find((table) => table.code === tableCode),
-  );
-
-  console.log(
-    restaurant?.tables?.map((table) => table.code),
-    ' ',
-    tableCode,
-  );
-
   return (
     <View style={styles.container}>
+      <Text>{restaurant?.tables?.map((table) => table.code)}</Text>
+
+      <Text>{tableCode}</Text>
       <Text style={styles.title}>{restaurant?.tables?.find((table) => table.code === tableCode)?.capacity} personas</Text>
       {restaurant?.menu?.categories?.map((category) => {
         return (
