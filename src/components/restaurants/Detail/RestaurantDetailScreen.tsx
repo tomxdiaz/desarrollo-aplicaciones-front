@@ -1,26 +1,74 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
-import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { restaurantService } from '../../../services/restaurant.service';
 import { Restaurant } from '../../../types/types';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
-const CREAM_BACKGROUND = `${COLORS.primary.arena_calida}33`;
+function parseTableCode(code: string) {
+  const clean = code.trim();
+
+  const parts = clean.split('/');
+
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    return null;
+  }
+
+  return {
+    restaurantId: parts[0],
+    tableId: parts[1],
+  };
+}
 
 const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [tableCode, setTableCode] = useState('');
+  const [tableCodeFocused, setTableCodeFocused] = useState(false);
+
+  const [scanning, setScanning] = useState(false);
+  const [scanned, setScanned] = useState(false);
+
+  const [permission, requestPermission] = useCameraPermissions();
+
+  const goToMenu = (rawCode: string) => {
+    const parsed = parseTableCode(rawCode);
+
+    if (!parsed) {
+      Alert.alert('Invalid code', 'The table code should look like restaurantId/tableId');
+      return;
+    }
+
+    router.push({
+      pathname: '/restaurants/[id]/menu',
+      params: { id, table: parsed.tableId },
+    });
+  };
+
+  const openScanner = async () => {
+    if (!permission?.granted) {
+      const result = await requestPermission();
+
+      if (!result.granted) {
+        Alert.alert('Camera permission is required to scan the QR code.');
+        return;
+      }
+    }
+
+    setScanned(false);
+    setScanning(true);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await restaurantService.getRestaurantById(id);
-        setRestaurant(data);
+        const restaurant = await restaurantService.getRestaurantById(id);
+        setRestaurant(restaurant);
       } catch (error) {
         console.error('Error fetching restaurant:', error);
         setRestaurant(null);
@@ -31,6 +79,30 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
     fetchData();
   }, [id]);
+
+  if (scanning) {
+    return (
+      <View style={{ flex: 1 }}>
+        <CameraView
+          style={{ flex: 1 }}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr'],
+          }}
+          onBarcodeScanned={({ data }) => {
+            if (scanned) return;
+
+            setScanned(true);
+            setScanning(false);
+            goToMenu(data);
+          }}
+        />
+
+        <Pressable style={styles.cancelButton} onPress={() => setScanning(false)}>
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   if (loading) {
     return (
@@ -83,21 +155,44 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
             <TextInput
               style={styles.tableInput}
-              placeholder='CÓDIGO DE MESA (A1, B3...)'
+              placeholder={tableCodeFocused ? undefined : 'CÓDIGO DE MESA (A1, B3...)'}
               placeholderTextColor={COLORS.common.gris_medio}
               value={tableCode}
               onChangeText={setTableCode}
+              onFocus={() => setTableCodeFocused(true)}
+              onBlur={() => setTableCodeFocused(false)}
               autoCapitalize='characters'
+              keyboardType='email-address'
             />
+
+            {tableCode.trim().length > 0 ? (
+              <Pressable
+                style={styles.menuButton}
+                onPress={() =>
+                  router.push({
+                    pathname: '/restaurants/[id]/menu',
+                    params: { id, table: tableCode.trim() },
+                  })
+                }>
+                <Text style={styles.menuButtonText}>Ir al menú</Text>
+              </Pressable>
+            ) : null}
 
             <View style={styles.divider} />
 
-            <Pressable style={styles.outlineButton} onPress={() => {}}>
-              <MaterialCommunityIcons name='qrcode-scan' size={ICON_SIZES.small} color={COLORS.primary.caramelo} />
+            <Pressable style={styles.outlineButton} onPress={openScanner}>
+              <MaterialCommunityIcons name='qrcode-scan' size={ICON_SIZES.small} colo={COLORS.primary.caramelo} />
               <Text style={styles.outlineButtonText}>Escanear QR de la mesa</Text>
             </Pressable>
 
-            <Pressable style={styles.outlineButton} onPress={() => {}}>
+            <Pressable
+              style={styles.outlineButton}
+              onPress={() =>
+                router.push({
+                  pathname: '/restaurants/[id]/menu',
+                  params: { id },
+                })
+              }>
               <Text style={styles.outlineButtonText}>Explorar menú sin mesa</Text>
             </Pressable>
           </View>
@@ -110,13 +205,11 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: CREAM_BACKGROUND,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: CREAM_BACKGROUND,
     padding: SPACING.large,
     gap: SPACING.medium,
   },
@@ -145,7 +238,6 @@ const styles = StyleSheet.create({
     height: 220,
   },
   content: {
-    backgroundColor: CREAM_BACKGROUND,
     paddingHorizontal: SPACING.large,
     paddingTop: SPACING.large,
     gap: SPACING.medium,
@@ -219,6 +311,19 @@ const styles = StyleSheet.create({
     color: COLORS.common.negro_principal,
     textAlign: 'center',
   },
+  menuButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary.terracota,
+    borderRadius: BORDER_RADIUS.extra_large,
+    paddingVertical: SPACING.medium,
+    paddingHorizontal: SPACING.large,
+  },
+  menuButtonText: {
+    fontSize: FONT_SIZES.text_base,
+    fontWeight: '700',
+    color: COLORS.common.blanco,
+  },
   outlineButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -235,6 +340,16 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     fontWeight: '700',
     color: COLORS.primary.caramelo,
+  },
+  cancelButton: {
+    padding: SPACING.medium,
+    backgroundColor: COLORS.common.gris_claro,
+    borderRadius: BORDER_RADIUS.extra_large,
+  },
+  cancelButtonText: {
+    fontSize: FONT_SIZES.text_base,
+    fontWeight: '700',
+    color: COLORS.common.gris_oscuro,
   },
 });
 
