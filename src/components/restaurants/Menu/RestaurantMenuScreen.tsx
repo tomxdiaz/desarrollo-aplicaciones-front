@@ -3,7 +3,7 @@ import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { useEffect, useState } from 'react';
-import { Restaurant } from '../../../types/types';
+import { Restaurant, RestaurantTable } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { Redirect } from 'expo-router';
 
@@ -15,15 +15,20 @@ type RestaurantMenuScreenProps = {
 const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [selectedTable, setSelectedTable] = useState<RestaurantTable | undefined>();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const restaurant = await restaurantService.getRestaurantById(id);
         setRestaurant(restaurant);
+        if (tableCode) {
+          setSelectedTable(restaurant.tables?.find((table) => table.code === tableCode));
+        }
       } catch (error) {
         console.error('Error fetching restaurant:', error);
         setRestaurant(null);
+        setSelectedTable(undefined);
       } finally {
         setLoading(false);
       }
@@ -40,16 +45,9 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
     );
   }
 
-  if (!loading && !restaurant) {
-    return <Redirect href='/restaurants' />;
-  }
-
-  return (
+  return restaurant ? (
     <View style={styles.container}>
-      <Text>{restaurant?.tables?.map((table) => table.code)}</Text>
-
-      <Text>{tableCode}</Text>
-      <Text style={styles.title}>{restaurant?.tables?.find((table) => table.code === tableCode)?.capacity} personas</Text>
+      <Text style={styles.title}>{selectedTable?.capacity} personas</Text>
       {restaurant?.menu?.categories?.map((category) => {
         return (
           <View key={category.id}>
@@ -72,6 +70,8 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
         );
       })}
     </View>
+  ) : (
+    <Redirect href={'/restaurants'} />
   );
 };
 
