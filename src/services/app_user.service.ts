@@ -7,4 +7,10 @@ export const appUserService = {
       requireAuth: true,
     });
   },
+
+  getAllUsers: async () => {
+    return apiClient<AppUser[]>('/app_user', {
+      requireAuth: true,
+    });
+  },
 };
