@@ -20,7 +20,11 @@ const MyRestaurantsListScreen = () => {
     fetchData();
   }, []);
 
-  return <AllUsersList users={allUsers} />;
+  const handleUserUpdated = (updated: AppUser) => {
+    setAllUsers((prev) => prev.map((user) => (user.id === updated.id ? updated : user)));
+  };
+
+  return <AllUsersList users={allUsers} onUserUpdated={handleUserUpdated} />;
 };
 
 export default MyRestaurantsListScreen;
