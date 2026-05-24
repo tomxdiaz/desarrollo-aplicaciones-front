@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
@@ -6,11 +6,11 @@ import { router } from 'expo-router';
 
 const OrderCard = ({ order }: { order: any }) => {
   const handlePress = () => {
-    router.push(`/my-orders/${order.id}`);
+    router.push(`/my-orders/${order.id}?restaurantId=${order.restaurant_id}`);
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} style={styles.card}>
+    <View style={styles.card}>
       <View style={styles.row}>
         <Text style={styles.id}>#{order.id}</Text>
         <Text style={[styles.status, getStatusStyle(order.status)]}>{order.status}</Text>
@@ -18,9 +18,12 @@ const OrderCard = ({ order }: { order: any }) => {
       <Text style={styles.restaurant}>{order.restaurant_name}</Text>
       <View style={styles.row}>
         <Text style={styles.total}>${order.total.toFixed(2)}</Text>
-        <Text style={styles.date}>{new Date(order.created_at).toLocaleString()}</Text>
+        <Pressable onPress={handlePress} style={styles.detailButton}>
+          <Text style={styles.detailButtonText}>Ver →</Text>
+        </Pressable>
       </View>
-    </TouchableOpacity>
+      <Text style={styles.date}>{new Date(order.created_at).toLocaleDateString('es-AR')}</Text>
+    </View>
   );
 };
 
@@ -77,9 +80,23 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: COLORS.primary.terracota,
   },
+  detailButton: {
+    paddingHorizontal: SPACING.medium,
+    paddingVertical: SPACING.small,
+    borderRadius: BORDER_RADIUS.extra_large,
+    borderWidth: 1,
+    borderColor: COLORS.primary.caramelo,
+    backgroundColor: COLORS.common.blanco,
+  },
+  detailButtonText: {
+    color: COLORS.primary.caramelo,
+    fontSize: FONT_SIZES.text_small,
+    fontWeight: '700',
+  },
   date: {
     fontSize: FONT_SIZES.text_small,
     color: COLORS.common.gris_medio,
+    marginTop: SPACING.small,
   },
 });
 

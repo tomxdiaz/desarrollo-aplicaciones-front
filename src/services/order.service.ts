@@ -1,14 +1,10 @@
 import { apiClient } from '../lib/apiClient';
 import { restaurantService } from './restaurant.service';
+import { MyOrderListItem, Order } from '../types/order.types';
 
 export const orderService = {
   getMyOrders: async () => {
-    // The backend controller exposing "mine" is under the route
-    // GET /restaurants/:restaurantId/orders/mine (controller: UserOrderController).
-    // The controller method does not require the path param, but the route contains it,
-    // so we call with restaurantId = 0 as a stable path segment. If your backend
-    // exposes a different route, change this path accordingly.
-    const orders = await apiClient<any[]>('/restaurants/0/orders/mine', {
+    const orders = await apiClient<Order[]>('/restaurants/0/orders/mine', {
       requireAuth: true,
     });
 
@@ -28,6 +24,15 @@ export const orderService = {
       }),
     );
 
-    return orders.map((o) => ({ ...o, restaurant_name: restaurantNameMap[o.restaurant_id] ?? `#${o.restaurant_id}` }));
+    return orders.map((o) => ({
+      ...o,
+      restaurant_name: restaurantNameMap[o.restaurant_id] ?? `#${o.restaurant_id}`,
+    })) as MyOrderListItem[];
+  },
+
+  getMyOrderById: async (restaurantId: string, id: string) => {
+    return apiClient<Order>(`/restaurants/${restaurantId}/orders/${id}`, {
+      requireAuth: true,
+    });
   },
 };
