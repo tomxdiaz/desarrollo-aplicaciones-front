@@ -9,6 +9,13 @@ export enum RestaurantTableStatusEnum {
   OCCUPIED = 'OCCUPIED',
 }
 
+export enum RestaurantOrderStatusEnum {
+  PENDING = 'PENDING',
+  IN_PROCESS = 'IN_PROCESS',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
+
 export type AppUser = {
   id: string;
   email: string;
@@ -70,4 +77,30 @@ export type RestaurantStaff = {
   user_id: string;
   restaurant_id: number;
   role: AppRoleEnum;
+};
+
+export type OrderItem = {
+  id: number;
+  order_id: number;
+  product_id: number | null;
+  product_name: string;
+  product_description: string | null;
+  product_image: string | null;
+  unit_price: number;
+  quantity: number;
+  subtotal: number;
+};
+
+export type Order = {
+  id: number;
+  restaurant_id: number;
+  restaurant?: Restaurant;
+  table_id: number;
+  user_id: string | null;
+  number: number;
+  status: RestaurantOrderStatusEnum;
+  total: number;
+  created_at: string;
+  items?: OrderItem[];
+  note: string | null;
 };

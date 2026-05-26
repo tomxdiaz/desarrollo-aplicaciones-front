@@ -4,19 +4,13 @@ import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import OrderCard from './OrderCard';
 import { useState } from 'react';
+import { ALL_ORDER_STATUS_FILTER, ORDER_STATUS_FILTER_OPTIONS, OrderStatusFilter } from '../../types/restaurant-order-status';
+import { Order } from '../../types/types';
 
-const STATUS_OPTIONS = [
-  { key: 'ALL', label: 'Todos' },
-  { key: 'PENDING', label: 'Pendiente' },
-  { key: 'IN_PROCESS', label: 'En proceso' },
-  { key: 'DELIVERED', label: 'Entregado' },
-  { key: 'CANCELLED', label: 'Cancelado' },
-];
+const MyOrdersList = ({ orders }: { orders: Order[] }) => {
+  const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>(ALL_ORDER_STATUS_FILTER);
 
-const MyOrdersList = ({ orders }: { orders: any[] }) => {
-  const [statusFilter, setStatusFilter] = useState('ALL');
-
-  const filtered = orders.filter((o) => (statusFilter === 'ALL' ? true : o.status === statusFilter));
+  const filtered = orders.filter((o) => (statusFilter === ALL_ORDER_STATUS_FILTER ? true : o.status === statusFilter));
 
   return (
     <View style={styles.container}>
@@ -27,15 +21,13 @@ const MyOrdersList = ({ orders }: { orders: any[] }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterBarContent}
         style={styles.filterBar}
-        contentInsetAdjustmentBehavior="never"
-        alwaysBounceVertical={false}
-      >
-        {STATUS_OPTIONS.map((s) => (
+        contentInsetAdjustmentBehavior='never'
+        alwaysBounceVertical={false}>
+        {ORDER_STATUS_FILTER_OPTIONS.map((s) => (
           <Pressable
             key={s.key}
             onPress={() => setStatusFilter(s.key)}
-            style={[styles.filterButton, statusFilter === s.key && styles.filterButtonActive]}
-          >
+            style={[styles.filterButton, statusFilter === s.key && styles.filterButtonActive]}>
             <Text style={[styles.filterText, statusFilter === s.key && styles.filterTextActive]}>{s.label}</Text>
           </Pressable>
         ))}
