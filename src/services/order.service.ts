@@ -15,4 +15,11 @@ export const orderService = {
       requireAuth: true,
     });
   },
+
+  cancelMyOrder: async (id: string) => {
+    return apiClient<Order>(`/orders/${id}/cancel`, {
+      method: 'PATCH',
+      requireAuth: true,
+    });
+  },
 };

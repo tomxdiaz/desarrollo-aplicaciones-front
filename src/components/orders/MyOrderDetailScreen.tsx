@@ -28,6 +28,7 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
   const [order, setOrder] = useState<Order | null>(null);
   const [restaurantName, setRestaurantName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -75,6 +76,22 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
     return new Date(order.created_at).toLocaleDateString('es-AR');
   }, [order?.created_at]);
 
+  const handleCancelOrder = async () => {
+    if (!order || order.status !== 'PENDING' || cancelling) {
+      return;
+    }
+
+    try {
+      setCancelling(true);
+      const updatedOrder = await orderService.cancelMyOrder(String(order.id));
+      setOrder(updatedOrder);
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -106,6 +123,12 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
         </View>
         <Text style={styles.dateText}>{formattedDate}</Text>
       </View>
+
+      {order.status === 'PENDING' && (
+        <Pressable style={[styles.cancelButton, cancelling && styles.cancelButtonDisabled]} onPress={handleCancelOrder} disabled={cancelling}>
+          <Text style={styles.cancelButtonText}>{cancelling ? 'Cancelando...' : 'Cancelar pedido'}</Text>
+        </Pressable>
+      )}
 
       <Text style={styles.restaurantText}>{restaurantName}</Text>
 
@@ -210,6 +233,23 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_large,
     fontWeight: '700',
     color: COLORS.primary.caramelo,
+  },
+  cancelButton: {
+    height: 56,
+    borderRadius: BORDER_RADIUS.medium,
+    borderWidth: 1,
+    borderColor: COLORS.status.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.common.blanco,
+  },
+  cancelButtonDisabled: {
+    opacity: 0.6,
+  },
+  cancelButtonText: {
+    fontSize: FONT_SIZES.text_large,
+    fontWeight: '700',
+    color: COLORS.status.error,
   },
   errorText: {
     fontSize: FONT_SIZES.text_large,
