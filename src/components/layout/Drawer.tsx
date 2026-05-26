@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, ScrollView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../providers/auth.provider';
 import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -30,7 +30,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
 
   return (
     <Modal visible={isOpen} transparent animationType='fade' onRequestClose={onClose}>
-      <View style={{...styles.overlay, marginTop: insets.top}}>
+      <View style={{...styles.overlay, marginTop: Platform.OS ==='ios'? insets.top:0}}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         <View style={styles.drawer}>

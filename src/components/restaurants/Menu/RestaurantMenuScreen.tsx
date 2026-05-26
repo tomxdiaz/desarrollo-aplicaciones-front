@@ -1,11 +1,14 @@
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { Redirect, router } from 'expo-router';
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
-import { FONT_SIZES } from '../../../constants/font_sizes';
-import { useEffect, useState } from 'react';
 import { Restaurant, RestaurantTable } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
-import { Redirect } from 'expo-router';
+import { useCart } from '../../../providers/cart.provider';
+import MenuCategoryTabs from './MenuCategoryTabs';
+import MenuProductCard from './MenuProductCard';
+import { getActiveCategories, getProductsForCategory } from './menu.utils';
 
 type RestaurantMenuScreenProps = {
   id: string;
@@ -13,17 +16,27 @@ type RestaurantMenuScreenProps = {
 };
 
 const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
+  const { setSession, getProductQuantity, incrementProduct, decrementProduct, hasTable } = useCart();
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | undefined>();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+
+  const categories = useMemo(() => getActiveCategories(restaurant?.menu), [restaurant?.menu]);
+  const products = useMemo(
+    () => getProductsForCategory(restaurant?.menu, selectedCategoryId),
+    [restaurant?.menu, selectedCategoryId],
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const restaurant = await restaurantService.getRestaurantById(id);
-        setRestaurant(restaurant);
+        const data = await restaurantService.getRestaurantById(id);
+        setRestaurant(data);
         if (tableCode) {
-          setSelectedTable(restaurant.tables?.find((table) => table.code === tableCode));
+          setSelectedTable(data.tables?.find((table) => table.code === tableCode));
+        } else {
+          setSelectedTable(undefined);
         }
       } catch (error) {
         console.error('Error fetching restaurant:', error);
@@ -35,68 +48,79 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, tableCode]);
+
+  useEffect(() => {
+    if (!restaurant) {
+      return;
+    }
+
+    setSession({
+      restaurantId: String(restaurant.id),
+      restaurantName: restaurant.name,
+      tableCode: selectedTable?.code,
+    });
+  }, [restaurant, selectedTable, setSession]);
+
+  const handleChooseTable = () => {
+    router.push(`/restaurants/${id}`);
+  };
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centered}>
         <ActivityIndicator size='large' color={COLORS.primary.terracota} />
       </View>
     );
   }
 
-  return restaurant ? (
-    <View style={styles.container}>
-      <Text style={styles.title}>{selectedTable?.capacity} personas</Text>
-      {restaurant?.menu?.categories?.map((category) => {
-        return (
-          <View key={category.id}>
-            <Text>{category.name}</Text>
-            {category.products?.map((product) => {
-              return (
-                <View key={product.id}>
-                  <TouchableOpacity>
-                    <Text>{product.name}</Text>
-                    {tableCode ? (
-                      <TouchableOpacity>
-                        <Text>Agregar</Text>
-                      </TouchableOpacity>
-                    ) : null}
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </View>
-        );
-      })}
+  if (!restaurant) {
+    return <Redirect href='/restaurants' />;
+  }
+
+  return (
+    <View style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <MenuCategoryTabs
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onSelect={setSelectedCategoryId}
+        />
+        <View style={styles.productList}>
+          {products.map((product) => (
+            <MenuProductCard
+              key={product.id}
+              product={product}
+              hasTable={hasTable}
+              quantity={getProductQuantity(product.id)}
+              onIncrement={() => incrementProduct(product.id)}
+              onDecrement={() => decrementProduct(product.id)}
+            />
+          ))}
+        </View>
+      </ScrollView>
     </View>
-  ) : (
-    <Redirect href={'/restaurants'} />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
+    flex: 1,
+    backgroundColor: COLORS.common.gris_muy_claro,
+  },
+  centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.common.gris_muy_claro,
-    padding: SPACING.large,
+  },
+  scrollContent: {
+    padding: SPACING.medium,
+    gap: SPACING.medium,
+    paddingBottom: SPACING.extra_large,
+  },
+  productList: {
     gap: SPACING.small,
-  },
-  title: {
-    fontSize: FONT_SIZES.title_base,
-    fontWeight: '800',
-    color: COLORS.common.negro_principal,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.gris_oscuro,
-  },
-  tableLabel: {
-    fontSize: FONT_SIZES.text_base,
-    fontWeight: '700',
-    color: COLORS.primary.terracota,
   },
 });
 

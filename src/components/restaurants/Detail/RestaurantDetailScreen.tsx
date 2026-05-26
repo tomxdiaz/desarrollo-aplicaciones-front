@@ -45,7 +45,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
     }
 
     router.push({
-      pathname: '/restaurants/[id]/menu',
+      pathname: '/(header-2)/restaurants/[id]/menu',
       params: { id: parsed.restaurantId, table: parsed.tableCode },
     });
   };
@@ -170,7 +170,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
                 style={styles.menuButton}
                 onPress={() =>
                   router.push({
-                    pathname: '/restaurants/[id]/menu',
+                    pathname: '/(header-2)/restaurants/[id]/menu',
                     params: { id, table: tableCode.trim() },
                   })
                 }>
@@ -189,7 +189,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
               style={styles.outlineButton}
               onPress={() =>
                 router.push({
-                  pathname: '/restaurants/[id]/menu',
+                  pathname: '/(header-2)/restaurants/[id]/menu',
                   params: { id },
                 })
               }>
