@@ -9,8 +9,6 @@ import { ICON_SIZES } from '../../constants/icon_sizes';
 import { useCart } from '../../providers/cart.provider';
 import { Drawer } from './Drawer';
 
-const ICON_BUTTON_SIZE = 44;
-
 export default function Header2() {
   const { session, cartCount, hasTable } = useCart();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -35,8 +33,7 @@ export default function Header2() {
             if (router.canGoBack()) {
               router.back();
             }
-          }}
-        >
+          }}>
           <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
         </Pressable>
         <View style={styles.textGroup}>
@@ -100,8 +97,8 @@ const styles = StyleSheet.create({
     gap: SPACING.small,
   },
   iconButton: {
-    width: ICON_BUTTON_SIZE,
-    height: ICON_BUTTON_SIZE,
+    width: ICON_SIZES.extra_large,
+    height: ICON_SIZES.extra_large,
     borderRadius: BORDER_RADIUS.extra_large,
     backgroundColor: COLORS.common.gris_muy_claro,
     alignItems: 'center',

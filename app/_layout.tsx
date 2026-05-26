@@ -12,18 +12,16 @@ SplashScreen.setOptions({
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} enabled>
-        <SafeAreaProvider>
-          <SafeAreaView style={styles.safeAreaView}>
-            <Stack
-              screenOptions={{
-                animation: 'fade',
-                headerShown: false,
-              }}
-            />
-          </SafeAreaView>
-        </SafeAreaProvider>
-      </KeyboardAvoidingView>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeAreaView}>
+          <Stack
+            screenOptions={{
+              animation: 'fade',
+              headerShown: false,
+            }}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </AuthProvider>
   );
 }

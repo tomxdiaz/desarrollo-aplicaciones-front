@@ -5,7 +5,7 @@ import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { formatPrice } from './menu.utils';
+import { formatPrice } from '../../../utils/menu';
 
 type MenuProductCardProps = {
   product: Product;
@@ -19,8 +19,6 @@ const PLACEHOLDER_IMAGE = require('../../../../assets/images/restaurant.jpg');
 
 const MenuProductCard = ({ product, hasTable, quantity, onIncrement, onDecrement }: MenuProductCardProps) => {
   const imageSource = product.image ? { uri: product.image } : PLACEHOLDER_IMAGE;
-
-
 
   return (
     <View style={styles.card}>
@@ -38,12 +36,12 @@ const MenuProductCard = ({ product, hasTable, quantity, onIncrement, onDecrement
       </View>
       {hasTable ? (
         <View style={styles.stepper}>
-          <Pressable style={styles.stepperButton} onPress={onDecrement}>
-            <AntDesign name='minus' size={ICON_SIZES.small} color={COLORS.primary.terracota} />2
-          </Pressable>
-          <Text style={styles.quantity}>{quantity}</Text>
           <Pressable style={styles.stepperButton} onPress={onIncrement}>
             <AntDesign name='plus' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
+          </Pressable>
+          <Text style={styles.quantity}>{quantity}</Text>
+          <Pressable style={styles.stepperButton} onPress={onDecrement}>
+            <AntDesign name='minus' size={ICON_SIZES.small} color={COLORS.primary.terracota} />2
           </Pressable>
         </View>
       ) : null}

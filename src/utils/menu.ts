@@ -1,4 +1,4 @@
-import { Category, Menu, Product } from '../../../types/types';
+import { Menu, Category, Product } from '../types/types';
 
 export function formatPrice(price: number): string {
   return `$${price.toLocaleString('es-AR')}`;

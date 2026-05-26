@@ -8,7 +8,8 @@ import { restaurantService } from '../../../services/restaurant.service';
 import { useCart } from '../../../providers/cart.provider';
 import MenuCategoryTabs from './MenuCategoryTabs';
 import MenuProductCard from './MenuProductCard';
-import { getActiveCategories, getProductsForCategory } from './menu.utils';
+import { getActiveCategories, getProductsForCategory } from '../../../utils/menu';
+import LoadingSpinner from '../../loading/LoadingSpinner';
 
 type RestaurantMenuScreenProps = {
   id: string;
@@ -23,10 +24,7 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   const categories = useMemo(() => getActiveCategories(restaurant?.menu), [restaurant?.menu]);
-  const products = useMemo(
-    () => getProductsForCategory(restaurant?.menu, selectedCategoryId),
-    [restaurant?.menu, selectedCategoryId],
-  );
+  const products = useMemo(() => getProductsForCategory(restaurant?.menu, selectedCategoryId), [restaurant?.menu, selectedCategoryId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,16 +60,8 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
     });
   }, [restaurant, selectedTable, setSession]);
 
-  const handleChooseTable = () => {
-    router.push(`/restaurants/${id}`);
-  };
-
   if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size='large' color={COLORS.primary.terracota} />
-      </View>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!restaurant) {
@@ -81,11 +71,7 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <MenuCategoryTabs
-          categories={categories}
-          selectedCategoryId={selectedCategoryId}
-          onSelect={setSelectedCategoryId}
-        />
+        <MenuCategoryTabs categories={categories} selectedCategoryId={selectedCategoryId} onSelect={setSelectedCategoryId} />
         <View style={styles.productList}>
           {products.map((product) => (
             <MenuProductCard
@@ -108,12 +94,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.common.gris_muy_claro,
   },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.common.gris_muy_claro,
-  },
+
   scrollContent: {
     padding: SPACING.medium,
     gap: SPACING.medium,
