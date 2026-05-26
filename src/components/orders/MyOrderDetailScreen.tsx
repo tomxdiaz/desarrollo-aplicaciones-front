@@ -34,7 +34,7 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
 
     const load = async () => {
       try {
-        const response = await orderService.getMyOrderById(restaurantId, id);
+        const response = await orderService.getMyOrderById(id);
 
         if (!mounted) return;
 

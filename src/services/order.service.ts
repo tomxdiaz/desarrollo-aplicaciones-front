@@ -9,4 +9,11 @@ export const orderService = {
 
     return orders;
   },
+
+  getMyOrderById: async (restaurantId: string, id: string) => {
+    return apiClient<Order>(/restaurants/${restaurantId}/orders/${id}, {
+      requireAuth: true,
+    });
+  }
+
 };
