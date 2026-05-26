@@ -11,9 +11,8 @@ export const orderService = {
   },
 
   getMyOrderById: async (restaurantId: string, id: string) => {
-    return apiClient<Order>(/restaurants/${restaurantId}/orders/${id}, {
+    return apiClient<Order>(`/restaurants/${restaurantId}/orders/${id}`, {
       requireAuth: true,
     });
-  }
-
+  },
 };

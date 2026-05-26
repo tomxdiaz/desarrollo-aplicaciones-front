@@ -38,7 +38,7 @@ async function getAccessToken(): Promise<string | null> {
   return data.session?.access_token ?? null;
 }
 
-export async function apiClient<T>(p0: RegExp, p1: number, p2: { id: string; }, p3: { requireAuth: boolean; }, endpoint: string, options: ApiClientOptions = {}): Promise<T> {
+export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
   const { method = 'GET', body, headers = {}, requireAuth = true } = options;
 
   const token = requireAuth ? await getAccessToken() : null;
