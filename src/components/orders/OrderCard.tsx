@@ -3,8 +3,10 @@ import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import { router } from 'expo-router';
+import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../types/restaurant-order-status';
+import { Order } from '../../types/types';
 
-const OrderCard = ({ order }: { order: any }) => {
+const OrderCard = ({ order }: { order: Order }) => {
   const handlePress = () => {
     router.push(`/my-orders/${order.id}?restaurantId=${order.restaurant_id}`);
   };
@@ -13,9 +15,9 @@ const OrderCard = ({ order }: { order: any }) => {
     <View style={styles.card}>
       <View style={styles.row}>
         <Text style={styles.id}>#{order.id}</Text>
-        <Text style={[styles.status, getStatusStyle(order.status)]}>{order.status}</Text>
+        <Text style={[styles.status, getRestaurantOrderStatusStyle(order.status)]}>{RESTAURANT_ORDER_STATUS_LABELS[order.status]}</Text>
       </View>
-      <Text style={styles.restaurant}>{order.restaurant_name}</Text>
+      {order.restaurant && <Text style={styles.restaurant}>{order.restaurant.name}</Text>}
       <View style={styles.row}>
         <Text style={styles.total}>${order.total.toFixed(2)}</Text>
         <Pressable onPress={handlePress} style={styles.detailButton}>
@@ -25,21 +27,6 @@ const OrderCard = ({ order }: { order: any }) => {
       <Text style={styles.date}>{new Date(order.created_at).toLocaleDateString('es-AR')}</Text>
     </View>
   );
-};
-
-const getStatusStyle = (status: string) => {
-  switch (status) {
-    case 'PENDING':
-      return { color: COLORS.status.advertencia };
-    case 'IN_PROCESS':
-      return { color: COLORS.primary.caramelo };
-    case 'DELIVERED':
-      return { color: COLORS.status.exito };
-    case 'CANCELLED':
-      return { color: COLORS.status.error };
-    default:
-      return { color: COLORS.common.gris_oscuro };
-  }
 };
 
 const styles = StyleSheet.create({
