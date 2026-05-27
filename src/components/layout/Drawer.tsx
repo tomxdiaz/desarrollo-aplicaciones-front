@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, ScrollView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../providers/auth.provider';
 import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -7,6 +7,9 @@ import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { COLORS } from '../../constants/colors';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { ICON_SIZES } from '../../constants/icon_sizes';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { isRole } from '../../utils/role';
+import { AppRoleEnum } from '../../types/types';
 
 type DrawerProps = {
   isOpen: boolean;
@@ -15,6 +18,7 @@ type DrawerProps = {
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {
   const { appUser, loading, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const goTo = (path: string) => {
     onClose();
@@ -28,7 +32,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
 
   return (
     <Modal visible={isOpen} transparent animationType='fade' onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View style={{ ...styles.overlay, marginTop: Platform.OS === 'ios' ? insets.top : 0 }}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         <View style={styles.drawer}>
@@ -67,6 +71,12 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 <Ionicons name='storefront-outline' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
                 <Text style={styles.navText}>Mis Restaurantes</Text>
               </Pressable>
+              {appUser && isRole(appUser, [AppRoleEnum.SUPER_USER]) && (
+                <Pressable style={styles.navItem} onPress={() => goTo('/users')}>
+                  <MaterialIcons name='person' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
+                  <Text style={styles.navText}>Usuarios</Text>
+                </Pressable>
+              )}
             </View>
           </ScrollView>
 

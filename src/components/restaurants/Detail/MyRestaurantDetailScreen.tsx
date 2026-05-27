@@ -1,47 +1,80 @@
-import { Text, View } from 'react-native';
-import { Restaurant, RestaurantStaff } from '../../../types/types';
 import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+import { Restaurant, RestaurantStaff } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
 
 const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
-  const [myRestaurant, setMyRestaurant] = useState<Restaurant | null>();
-  const [myRestaurantStaffInfo, setMyRestaurantStaffInfo] = useState<RestaurantStaff | null>();
+  const [myRestaurant, setMyRestaurant] = useState<Restaurant | null>(null);
+  const [myRestaurantStaffInfo, setMyRestaurantStaffInfo] = useState<RestaurantStaff | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       try {
-        const myRestaurant = await restaurantService.getRestaurantById(id);
-        setMyRestaurant(myRestaurant);
-        const myRestaurantStaffInfo = await restaurantStaffService.getMyRestaurantStaffInfo(id);
-        setMyRestaurantStaffInfo(myRestaurantStaffInfo);
-        setLoading(false);
+        const restaurant = await restaurantService.getRestaurantById(id);
+        setMyRestaurant(restaurant);
       } catch (error) {
         setMyRestaurant(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const staffInfo = await restaurantStaffService.getMyRestaurantStaffInfo(id);
+
+        setMyRestaurantStaffInfo(staffInfo);
+      } catch (error) {
+        console.error('Error fetching restaurant staff info:', error);
         setMyRestaurantStaffInfo(null);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Cargando restaurante...</Text>
+      </View>
+    );
+  }
 
   if (!myRestaurant) {
-    return <Text>El restaurante no existe</Text>;
+    return (
+      <View style={styles.container}>
+        <Text>El restaurante no existe</Text>
+      </View>
+    );
   }
 
   if (!myRestaurantStaffInfo) {
-    return <Text>No formas parte de este restaurante</Text>;
+    return (
+      <View style={styles.container}>
+        <Text>No formas parte de este restaurante</Text>
+      </View>
+    );
   }
 
   return (
-    <View>
-      <Text>{`Restaurant ID: ${myRestaurant.id}`}</Text>
-      <Text>{myRestaurant.name}</Text>
-      <Text>{`Mi rol en este restaurante: ${myRestaurantStaffInfo.role}`}</Text>
+    <View style={styles.container}>
+      <Text>myRestaurant name: {myRestaurant.name}</Text>
+      <Text>myRestaurant rol: {myRestaurantStaffInfo.role}</Text>
     </View>
   );
 };
 
 export default MyRestaurantDetailScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+});

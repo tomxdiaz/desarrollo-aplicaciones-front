@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import React, { useEffect, useState } from 'react';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { useAuth } from '../../providers/auth.provider';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function AuthScreen({
   title,
@@ -34,7 +35,13 @@ export default function AuthScreen({
   }, [appUser, loading]);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps='handled'
+      enableOnAndroid
+      extraScrollHeight={80}
+      showsVerticalScrollIndicator={false}>
       <View style={styles.logoContainer}>
         <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
         <Text style={styles.logoTitle}>Provecho!</Text>
@@ -43,110 +50,119 @@ export default function AuthScreen({
       <Text style={styles.title}>{title}</Text>
 
       <View style={styles.form}>
-        <TextInput style={styles.input} placeholder='example@email.com' value={email} onChangeText={setEmail} />
+        <TextInput
+          style={styles.input}
+          placeholder='example@email.com'
+          value={email}
+          onChangeText={setEmail}
+          keyboardType='email-address'
+          autoCapitalize='none'
+        />
+
         <TextInput style={styles.input} placeholder='**********' value={password} onChangeText={setPassword} secureTextEntry />
+
         <TouchableOpacity style={styles.button} onPress={() => handleAuth(email, password)}>
           <Text style={styles.buttonText}>{buttonText}</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.registerContainer}>
-        <Text style={styles.registerText}>{alternativeActionText}</Text>
-        <TouchableOpacity style={styles.registerButton} onPress={onPressLink}>
-          <Text style={styles.registerButtonText}>{alternativeActionLinkText}</Text>
+      <View style={styles.alternativeActionContainer}>
+        <Text style={styles.alternativeActionText}>{alternativeActionText}</Text>
+
+        <TouchableOpacity style={styles.alternativeActionButton} onPress={onPressLink}>
+          <Text style={styles.alternativeActionButtonText}>{alternativeActionLinkText}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* <TouchableOpacity style={styles.guestButton} onPress={() => router.navigate('/')}>
-        <Text style={styles.guestButtonText}>Continuar como invitado</Text>
-      </TouchableOpacity> */}
-
       <StatusBar style='auto' />
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: `${COLORS.primary.terracota}22`,
+  },
+
+  content: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: `${COLORS.primary.terracota}22`,
-    display: 'flex',
-    flexDirection: 'column',
+    padding: SPACING.large,
     gap: SPACING.extra_large,
   },
+
   logoContainer: {
-    display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: COLORS.primary.terracota,
     borderRadius: BORDER_RADIUS.extra_large,
     padding: SPACING.large,
   },
+
   logo: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
     borderRadius: BORDER_RADIUS.large,
   },
+
   logoTitle: {
     fontSize: FONT_SIZES.title_large,
     fontWeight: 'bold',
     color: COLORS.common.blanco,
   },
+
   title: {
     fontSize: FONT_SIZES.title_base,
     fontWeight: 'bold',
     color: COLORS.primary.terracota,
   },
+
   form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: SPACING.large,
     width: '80%',
     backgroundColor: COLORS.common.blanco,
     padding: SPACING.large,
     borderRadius: BORDER_RADIUS.medium,
+    gap: SPACING.large,
   },
+
   input: {
     backgroundColor: `${COLORS.primary.terracota}22`,
     borderRadius: BORDER_RADIUS.medium,
     padding: SPACING.medium,
     fontSize: FONT_SIZES.text_base,
   },
+
   button: {
     backgroundColor: COLORS.primary.terracota,
     borderRadius: BORDER_RADIUS.medium,
     padding: SPACING.medium,
   },
+
   buttonText: {
     color: COLORS.common.blanco,
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  registerContainer: {
-    display: 'flex',
+
+  alternativeActionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.small,
   },
-  registerText: {
+
+  alternativeActionText: {
     color: COLORS.primary.caramelo,
   },
-  registerButton: {
+
+  alternativeActionButton: {
     backgroundColor: 'transparent',
     borderRadius: BORDER_RADIUS.small,
   },
-  registerButtonText: {
-    color: COLORS.primary.caramelo,
-    fontWeight: 'bold',
-  },
-  guestButton: {
-    backgroundColor: 'transparent',
-    borderRadius: BORDER_RADIUS.small,
-  },
-  guestButtonText: {
+
+  alternativeActionButtonText: {
     color: COLORS.primary.caramelo,
     fontWeight: 'bold',
   },
