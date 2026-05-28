@@ -40,7 +40,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
     const parsed = parseTableCode(rawCode);
 
     if (!parsed) {
-      Alert.alert('Invalid code', 'The table code should look like restaurantId/tableCode');
+      Alert.alert('Invalid code', 'The table code in invalid. Format: restaurantId/tableCode (e.g: 1/1A)');
       return;
     }
 

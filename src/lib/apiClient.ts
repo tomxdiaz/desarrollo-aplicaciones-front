@@ -1,3 +1,4 @@
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { supabase } from './supabaseClient';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -15,62 +16,108 @@ type ApiClientOptions = {
   requireAuth?: boolean;
 };
 
-class ApiError extends Error {
-  status: number;
-  data: unknown;
+type BackendError = {
+  message: string | string[];
+  error: string;
+  statusCode: number;
+};
 
-  constructor(message: string, status: number, data: unknown) {
+export class ApiError extends Error {
+  status: number;
+  data: BackendError | unknown;
+
+  constructor(message: string, status: number, data: BackendError | unknown) {
     super(message);
+
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
   }
 }
 
-async function getAccessToken(): Promise<string | null> {
-  const { data, error } = await supabase.auth.getSession();
+let accessToken: string | null = null;
 
-  if (error) {
-    console.error('Error getting Supabase session:', error);
-    return null;
-  }
+supabase.auth.getSession().then(({ data }) => {
+  accessToken = data.session?.access_token ?? null;
+});
 
-  return data.session?.access_token ?? null;
-}
+supabase.auth.onAuthStateChange((_event, session) => {
+  accessToken = session?.access_token ?? null;
+});
+
+const axiosInstance: AxiosInstance = axios.create({
+  baseURL: API_URL,
+  timeout: 10000,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    const requireAuth = config.headers?.requireAuth !== 'false';
+
+    if (requireAuth) {
+      if (!accessToken) {
+        const { data } = await supabase.auth.getSession();
+
+        accessToken = data.session?.access_token ?? null;
+      }
+
+      if (!accessToken) {
+        throw new ApiError('User is not authenticated', 401, null);
+      }
+
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    delete config.headers.requireAuth;
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError<BackendError>) => {
+    // Hacer sign out si el token esta expirado
+    if (error.response?.status === 401) {
+      await supabase.auth.signOut();
+    }
+
+    const status = error.response?.status ?? 500;
+
+    const data = error.response?.data ?? null;
+
+    const message =
+      typeof data === 'object' && data !== null && 'message' in data
+        ? Array.isArray(data.message)
+          ? data.message.join(', ')
+          : data.message
+        : error.message;
+
+    return Promise.reject(new ApiError(message, status, data));
+  },
+);
+
+// API CLIENT
 
 export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
   const { method = 'GET', body, headers = {}, requireAuth = true } = options;
 
-  const token = requireAuth ? await getAccessToken() : null;
-
-  if (requireAuth && !token) {
-    throw new Error('User is not authenticated');
-  }
-
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const config: AxiosRequestConfig = {
+    url: endpoint,
     method,
+    data: body,
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
+      requireAuth: String(requireAuth),
     },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  };
 
-  let data: unknown = null;
+  const response = await axiosInstance.request<T>(config);
 
-  const contentType = response.headers.get('content-type');
-
-  if (contentType?.includes('application/json')) {
-    data = await response.json();
-  } else {
-    data = await response.text();
-  }
-
-  if (!response.ok) {
-    throw new ApiError(`API request failed with status ${response.status}`, response.status, data);
-  }
-
-  return data as T;
+  return response.data;
 }
