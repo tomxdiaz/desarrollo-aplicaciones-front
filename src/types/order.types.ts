@@ -16,20 +16,22 @@ export type Order = {
   id: number;
   restaurant_id: number;
   table_id: number;
-  user_id: string | null;
+  user_id: string;
   number: number;
   status: OrderStatus;
   total: number;
   created_at: string;
   items?: OrderItem[];
-  note: string | null;
+  note?: string | null;
 };
 
 export type CreateOrderPayload = {
   table_code: string;
-  items: {
-    product_id: number;
-    quantity: number;
-  }[];
-  note: string;
+  items: CreateOrderItemPayload[];
+  note?: string;
+};
+
+export type CreateOrderItemPayload = {
+  product_id: number;
+  quantity: number;
 };
