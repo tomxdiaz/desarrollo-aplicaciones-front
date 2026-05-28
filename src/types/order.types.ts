@@ -25,6 +25,11 @@ export type Order = {
   note: string | null;
 };
 
-export type MyOrderListItem = Order & {
-  restaurant_name?: string;
+export type CreateOrderPayload = {
+  table_code: string;
+  items: {
+    product_id: number;
+    quantity: number;
+  }[];
+  note: string;
 };
