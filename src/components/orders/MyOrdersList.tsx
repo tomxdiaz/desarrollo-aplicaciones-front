@@ -7,7 +7,13 @@ import { useState } from 'react';
 import { ALL_ORDER_STATUS_FILTER, ORDER_STATUS_FILTER_OPTIONS, OrderStatusFilter } from '../../types/restaurant-order-status';
 import { Order } from '../../types/types';
 
-const MyOrdersList = ({ orders }: { orders: Order[] }) => {
+const MyOrdersList = ({
+  orders,
+  onCancelOrder,
+}: {
+  orders: Order[];
+  onCancelOrder?: (order: Order) => void;
+}) => {
   const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>(ALL_ORDER_STATUS_FILTER);
 
   const filtered = orders.filter((o) => (statusFilter === ALL_ORDER_STATUS_FILTER ? true : o.status === statusFilter));
@@ -35,7 +41,7 @@ const MyOrdersList = ({ orders }: { orders: Order[] }) => {
 
       <View style={styles.list}>
         {filtered && filtered.length > 0 ? (
-          filtered.map((order) => <OrderCard key={order.id} order={order} />)
+          filtered.map((order) => <OrderCard key={order.id} order={order} onCancel={onCancelOrder} />)
         ) : (
           <Text style={styles.emptyText}>{'No tienes pedidos aún.'}</Text>
         )}
