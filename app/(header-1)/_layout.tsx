@@ -1,15 +1,15 @@
 import { Stack } from 'expo-router';
-import Layout from '../../src/components/layout/Layout';
+import Layout1 from '../../src/components/layout/Layout-1';
 
-export default function AppLayout() {
+export default function Header1Layout() {
   return (
-    <Layout>
+    <Layout1>
       <Stack
         screenOptions={{
           animation: 'fade',
           headerShown: false,
         }}
       />
-    </Layout>
+    </Layout1>
   );
 }

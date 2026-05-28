@@ -14,7 +14,7 @@ SplashScreen.setOptions({
   fade: true,
 });
 
-export default function Header() {
+export default function Header1() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleToggleDrawer = () => {
@@ -23,12 +23,14 @@ export default function Header() {
 
   return (
     <View style={styles.header}>
-       <Pressable onPress={()=>{
-        if (router.canGoBack()){
-          router.back()
-        }}}>
-          <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
-        </Pressable>
+      <Pressable
+        onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          }
+        }}>
+        <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
+      </Pressable>
       <View style={styles.logoTitleContainer}>
         <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
         <View>

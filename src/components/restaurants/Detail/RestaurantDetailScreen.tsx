@@ -28,8 +28,8 @@ function parseTableCode(code: string) {
 const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [tableCode, setTableCode] = useState('');
-  const [tableCodeFocused, setTableCodeFocused] = useState(false);
+  const [tableInput, setTableInput] = useState('');
+  const [tableInputFocused, setTableInputFocused] = useState(false);
 
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -45,7 +45,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
     }
 
     router.push({
-      pathname: '/(header-2)/restaurants/[id]/menu',
+      pathname: '/restaurants/[id]/menu',
       params: { id: parsed.restaurantId, table: parsed.tableCode },
     });
   };
@@ -155,25 +155,26 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
             <TextInput
               style={styles.tableInput}
-              placeholder={tableCodeFocused ? undefined : 'CÓDIGO DE MESA (A1, B3...)'}
+              placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (A1, B3...)'}
               placeholderTextColor={COLORS.common.gris_medio}
-              value={tableCode}
-              onChangeText={setTableCode}
-              onFocus={() => setTableCodeFocused(true)}
-              onBlur={() => setTableCodeFocused(false)}
+              value={tableInput}
+              onChangeText={setTableInput}
+              onFocus={() => setTableInputFocused(true)}
+              onBlur={() => setTableInputFocused(false)}
               autoCapitalize='characters'
               keyboardType='email-address'
             />
 
-            {tableCode.trim().length > 0 ? (
+            {tableInput.trim().length > 0 ? (
               <Pressable
                 style={styles.menuButton}
-                onPress={() =>
+                onPress={() => {
+                  const parsed = parseTableCode(tableInput);
                   router.push({
-                    pathname: '/(header-2)/restaurants/[id]/menu',
-                    params: { id, table: tableCode.trim() },
-                  })
-                }>
+                    pathname: '/restaurants/[id]/menu',
+                    params: { id, table: parsed?.tableCode },
+                  });
+                }}>
                 <Text style={styles.menuButtonText}>Ir al menú</Text>
               </Pressable>
             ) : null}
@@ -189,7 +190,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
               style={styles.outlineButton}
               onPress={() =>
                 router.push({
-                  pathname: '/(header-2)/restaurants/[id]/menu',
+                  pathname: '/restaurants/[id]/menu',
                   params: { id },
                 })
               }>

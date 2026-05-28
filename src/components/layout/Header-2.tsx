@@ -24,6 +24,9 @@ export default function Header2() {
     // TODO: navegar a pantalla de carrito
   };
 
+  console.log('hasTable', hasTable);
+  console.log('tableLabel', tableLabel);
+
   return (
     <View style={styles.header}>
       <View style={styles.leftGroup}>
