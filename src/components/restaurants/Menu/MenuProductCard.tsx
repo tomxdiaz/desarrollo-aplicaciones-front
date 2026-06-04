@@ -1,23 +1,32 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { Product } from '../../../types/types';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { formatPrice } from '../../../utils/menu';
+import CartStepper from '../../shared/CartStepper';
 
 type MenuProductCardProps = {
   product: Product;
   hasTable: boolean;
   quantity: number;
+  onAdd: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
 };
 
 const PLACEHOLDER_IMAGE = require('../../../../assets/images/restaurant.jpg');
 
-const MenuProductCard = ({ product, hasTable, quantity, onIncrement, onDecrement }: MenuProductCardProps) => {
+const MenuProductCard = ({
+  product,
+  hasTable,
+  quantity,
+  onAdd,
+  onIncrement,
+  onDecrement,
+}: MenuProductCardProps) => {
   const imageSource = product.image ? { uri: product.image } : PLACEHOLDER_IMAGE;
 
   return (
@@ -35,15 +44,13 @@ const MenuProductCard = ({ product, hasTable, quantity, onIncrement, onDecrement
         <Text style={styles.price}>{formatPrice(product.price)}</Text>
       </View>
       {hasTable ? (
-        <View style={styles.stepper}>
-          <Pressable style={styles.stepperButton} onPress={onIncrement}>
-            <AntDesign name='plus' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
+        quantity === 0 ? (
+          <Pressable style={styles.addButton} onPress={onAdd}>
+            <AntDesign name='plus' size={ICON_SIZES.extra_small} color={COLORS.primary.terracota} />
           </Pressable>
-          <Text style={styles.quantity}>{quantity}</Text>
-          <Pressable style={styles.stepperButton} onPress={onDecrement}>
-            <AntDesign name='minus' size={ICON_SIZES.small} color={COLORS.primary.terracota} />2
-          </Pressable>
-        </View>
+        ) : (
+          <CartStepper quantity={quantity} onIncrement={onIncrement} onDecrement={onDecrement} />
+        )
       ) : null}
     </View>
   );
@@ -83,11 +90,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     fontWeight: '700',
   },
-  stepper: {
-    alignItems: 'center',
-    gap: SPACING.extra_small,
-  },
-  stepperButton: {
+  addButton: {
     width: 32,
     height: 32,
     borderRadius: BORDER_RADIUS.extra_large,
@@ -95,13 +98,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary.terracota,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  quantity: {
-    color: COLORS.primary.terracota,
-    fontSize: FONT_SIZES.text_base,
-    fontWeight: '700',
-    minWidth: 20,
-    textAlign: 'center',
   },
 });
 
