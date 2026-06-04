@@ -21,11 +21,8 @@ export default function Header2() {
   };
 
   const handleCartPress = () => {
-    // TODO: navegar a pantalla de carrito
+    router.push('/(checkout)/cart');
   };
-
-  console.log('hasTable', hasTable);
-  console.log('tableLabel', tableLabel);
 
   return (
     <View style={styles.header}>
