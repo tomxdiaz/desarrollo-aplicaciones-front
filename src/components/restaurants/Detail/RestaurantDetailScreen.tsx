@@ -151,11 +151,11 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
           <View style={styles.tableSection}>
             <Text style={styles.tableTitle}>¿Estás en mesa?</Text>
-            <Text style={styles.tableHint}>Ingresá el código que figura en tu mesa (ej: A3, TERRAZA)</Text>
+            <Text style={styles.tableHint}>Ingresá el código que figura en tu mesa (ej: 1A, TERRAZA)</Text>
 
             <TextInput
               style={styles.tableInput}
-              placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (A1, B3...)'}
+              placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (1A, 2B...)'}
               placeholderTextColor={COLORS.common.gris_medio}
               value={tableInput}
               onChangeText={setTableInput}
@@ -169,10 +169,9 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
               <Pressable
                 style={styles.menuButton}
                 onPress={() => {
-                  const parsed = parseTableCode(tableInput);
                   router.push({
                     pathname: '/restaurants/[id]/menu',
-                    params: { id, table: parsed?.tableCode },
+                    params: { id, table: tableInput.trim() },
                   });
                 }}>
                 <Text style={styles.menuButtonText}>Ir al menú</Text>

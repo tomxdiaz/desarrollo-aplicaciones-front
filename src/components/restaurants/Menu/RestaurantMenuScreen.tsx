@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
@@ -45,7 +45,13 @@ const RestaurantMenuScreen = ({ id, tableCode }: RestaurantMenuScreenProps) => {
         const data = await restaurantService.getRestaurantById(id);
         setRestaurant(data);
         if (tableCode) {
-          setSelectedTable(data.tables?.find((table) => table.code === tableCode));
+          const table = data.tables?.find((table) => table.code === tableCode)
+          if (!table) {
+            Alert.alert('Invalid code', 'The table code in invalid. Format: restaurantId/tableCode (e.g: 1/1A)');
+            router.back()
+            return;
+          }
+          setSelectedTable(table);
         } else {
           setSelectedTable(undefined);
         }

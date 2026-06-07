@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     paddingTop: SPACING.medium,
+    gap: SPACING.medium,
   },
   emptyText: {
     fontSize: FONT_SIZES.text_large,

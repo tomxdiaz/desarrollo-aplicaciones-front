@@ -3,8 +3,8 @@ import { CreateOrderPayload } from '../types/order.types';
 import { Order } from '../types/types';
 
 export const orderService = {
-  createOrder: async (payload: CreateOrderPayload) => {
-    const order = await apiClient<Order>('/orders', {
+  createOrder: async (restaurantId: string, payload: CreateOrderPayload) => {
+    const order = await apiClient<Order>(`/restaurants/${restaurantId}/orders`, {
       method: 'POST',
       requireAuth: true,
       body: payload,

@@ -36,7 +36,7 @@ const ConfirmOrderScreen = () => {
     setErrorMessage(null);
 
     try {
-      await orderService.createOrder({
+      await orderService.createOrder(session.restaurantId, {
         table_code: session.tableCode!,
         items: items.map((item) => ({
           product_id: item.productId,
@@ -46,6 +46,7 @@ const ConfirmOrderScreen = () => {
       clearCart();
       router.replace('/(checkout)/success');
     } catch (error) {
+      console.error('Error creating order:', error);
       setErrorMessage('No se pudo enviar el pedido. Intentá de nuevo.');
     } finally {
       setLoading(false);

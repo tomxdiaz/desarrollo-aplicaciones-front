@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useCart } from '../../providers/cart.provider';
@@ -15,11 +16,13 @@ const PLACEHOLDER_IMAGE = require('../../../assets/images/restaurant.jpg');
 const CartScreen = () => {
   const { session, items, cartTotal, incrementProduct, decrementProduct } = useCart();
 
-  useEffect(() => {
-    if (items.length === 0) {
-      router.replace('/');
-    }
-  }, [items]);
+  useFocusEffect(
+    useCallback(() => {
+      if (items.length === 0) {
+        router.replace('/');
+      }
+    }, [items]),
+  );
 
   if (!session || items.length === 0) return null;
 
