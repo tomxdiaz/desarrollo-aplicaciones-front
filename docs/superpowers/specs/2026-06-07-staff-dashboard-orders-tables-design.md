@@ -67,22 +67,25 @@ MyRestaurantDetailScreen (/my-restaurants/[id])
 prop (del fetch del restaurante en `MyRestaurantDetailScreen`) y se arma un mapa
 `table_id → RestaurantTable` para mostrar `code`/`area`.
 
-**Filtros** (tabs horizontales reutilizando el patrón visual de `MenuCategoryTabs`):
-Todos | Pendientes | En preparación | Entregados | Cancelados — mapeados 1:1 a
-`PENDING | IN_PROCESS | DELIVERED | CANCELLED`.
+**Filtros**: se reutiliza `ORDER_STATUS_FILTER_OPTIONS` y `ALL_ORDER_STATUS_FILTER` de
+`src/types/restaurant-order-status.ts` (ya generan "Todos" + un tab por cada
+`RestaurantOrderStatusEnum`, con sus labels en español), mostrados como tabs
+horizontales con el patrón visual de `MenuCategoryTabs`.
 
 **Tarjeta de pedido**:
-- Encabezado: `Mesa {table.code} · #{order.number}` + badge de estado coloreado
+- Encabezado: `Mesa {table.code} · #{order.number}` + badge de estado, reutilizando
+  `RESTAURANT_ORDER_STATUS_LABELS` y `getRestaurantOrderStatusStyle` (las mismas
+  constantes que usa `OrderCard` para el cliente — mismo pedido, misma etiqueta)
 - Lista de items: `{quantity}× {product_name}`, con `note` debajo si existe
 - Footer: tiempo transcurrido desde `created_at`, total (`formatPrice`)
 - Acción(es) según estado — visibles para **todos** los roles de staff:
 
-| Estado       | Etiqueta         | Acciones                                              |
-|--------------|------------------|-------------------------------------------------------|
-| `PENDING`    | "Nuevo"          | [Enviar a cocina] → `IN_PROCESS` · [Cancelar] → `CANCELLED` (con confirmación) |
-| `IN_PROCESS` | "En preparación" | [Marcar entregado] → `DELIVERED`                      |
-| `DELIVERED`  | "Entregado"      | (sin acciones, estado final)                           |
-| `CANCELLED`  | "Cancelado"      | (informativo)                                          |
+| Estado (label de `RESTAURANT_ORDER_STATUS_LABELS`) | Acciones                                              |
+|----------------------------------------------------|-------------------------------------------------------|
+| `PENDING` ("Pendiente")                            | [Enviar a cocina] → `IN_PROCESS` · [Cancelar] → `CANCELLED` (con confirmación) |
+| `IN_PROCESS` ("En proceso")                        | [Marcar entregado] → `DELIVERED`                      |
+| `DELIVERED` ("Entregado")                          | (sin acciones, estado final)                           |
+| `CANCELLED` ("Cancelado")                          | (informativo)                                          |
 
 "Cancelar" solo está disponible en `PENDING` y muestra un `Alert` de confirmación antes
 de llamar a `updateOrderStatus(restaurantId, orderId, CANCELLED)`.

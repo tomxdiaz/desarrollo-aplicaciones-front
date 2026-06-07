@@ -1,3 +1,10 @@
+export enum RestaurantStaffEnum {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  CASHIER_PLUS = 'CASHIER_PLUS',
+  CASHIER = 'CASHIER',
+}
+
 export enum AppRoleEnum {
   SUPER_USER = 'SUPER_USER',
   OWNER = 'OWNER',
@@ -72,11 +79,36 @@ export type CreateRestaurantPayload = {
   address?: string;
 };
 
+export type CreateTablePayload = {
+  code: string;
+  area?: string;
+  capacity: number;
+};
+
+export type CreateStaffPayload = {
+  email: string;
+  role: RestaurantStaffEnum;
+};
+
+export type CreateCategoryPayload = {
+  name: string;
+};
+
+export type CreateProductPayload = {
+  category_id: number;
+  name: string;
+  description?: string;
+  price: number;
+  image?: string;
+};
+
+export type UpdateProductPayload = Partial<CreateProductPayload>;
+
 export type RestaurantStaff = {
   id: number;
   user_id: string;
   restaurant_id: number;
-  role: AppRoleEnum;
+  role: RestaurantStaffEnum;
 };
 
 export type OrderItem = {
