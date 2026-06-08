@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
 
 import { Restaurant, RestaurantStaff } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
@@ -17,7 +18,8 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const [myRestaurant, setMyRestaurant] = useState<Restaurant | null>(null);
   const [myRestaurantStaffInfo, setMyRestaurantStaffInfo] = useState<RestaurantStaff | null>(null);
   const [activeTab, setActiveTab] = useState<StaffTabKey>('orders');
-  const [tableFilter, setTableFilter] = useState<number | null>(null);
+  const [openOrderForTable, setOpenOrderForTable] = useState<number | null>(null);
+  const { setRestaurantName } = useHeaderRestaurant();
 
   const loadData = useCallback(async () => {
     try {
@@ -47,6 +49,12 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     }, [loadData]),
   );
 
+  // Publish the restaurant name to Header-1 while this screen is mounted.
+  useEffect(() => {
+    setRestaurantName(myRestaurant?.name ?? null);
+    return () => setRestaurantName(null);
+  }, [myRestaurant?.name, setRestaurantName]);
+
   const refreshRestaurant = useCallback(async () => {
     try {
       const restaurant = await restaurantService.getRestaurantById(id);
@@ -61,9 +69,11 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   };
 
   const handleViewOrdersForTable = (tableId: number) => {
-    setTableFilter(tableId);
+    setOpenOrderForTable(tableId);
     setActiveTab('orders');
   };
+
+  const handleOrderOpened = useCallback(() => setOpenOrderForTable(null), []);
 
   if (loading) {
     return (
@@ -103,8 +113,8 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
         <RestaurantOrdersScreen
           restaurantId={id}
           tables={tables}
-          tableFilter={tableFilter}
-          onClearTableFilter={() => setTableFilter(null)}
+          openOrderForTable={openOrderForTable}
+          onOrderOpened={handleOrderOpened}
         />
       ) : (
         <RestaurantTablesScreen
@@ -123,7 +133,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: COLORS.common.gris_muy_claro,
+    backgroundColor: COLORS.surface.fondo_crema,
   },
   centered: {
     flex: 1,
@@ -138,12 +148,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.medium,
-    paddingTop: SPACING.medium,
+    paddingTop: SPACING.large,
+    paddingBottom: SPACING.small,
   },
   restaurantName: {
-    fontSize: FONT_SIZES.title_small,
+    fontSize: FONT_SIZES.title_base,
     fontWeight: '800',
     color: COLORS.common.negro_principal,
+    letterSpacing: 0.2,
   },
 });
 

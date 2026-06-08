@@ -20,6 +20,12 @@ export default function Header2() {
     setDrawerOpen((prev) => !prev);
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
   const handleCartPress = () => {
     router.push('/(checkout)/cart');
   };
@@ -29,11 +35,9 @@ export default function Header2() {
       <View style={styles.leftGroup}>
         <Pressable
           style={styles.iconButton}
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            }
-          }}>
+          onPress={handleBack}
+          accessibilityRole='button'
+          accessibilityLabel='Volver'>
           <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
         </Pressable>
         <View style={styles.textGroup}>
@@ -54,7 +58,12 @@ export default function Header2() {
           </View>
         ) : null}
         {hasTable ? (
-          <TouchableOpacity style={styles.iconButton} onPress={handleCartPress} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={handleCartPress}
+            activeOpacity={0.8}
+            accessibilityRole='button'
+            accessibilityLabel='Ver carrito'>
             <AntDesign name='shopping-cart' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
             {cartCount > 0 ? (
               <View style={styles.cartBadge}>
@@ -63,7 +72,11 @@ export default function Header2() {
             ) : null}
           </TouchableOpacity>
         ) : null}
-        <TouchableOpacity onPress={handleToggleDrawer} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={handleToggleDrawer}
+          style={styles.iconButton}
+          accessibilityRole='button'
+          accessibilityLabel='Abrir menú'>
           <AntDesign name='menu' size={ICON_SIZES.medium} color={COLORS.primary.terracota} />
         </TouchableOpacity>
       </View>

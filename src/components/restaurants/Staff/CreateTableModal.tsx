@@ -129,8 +129,9 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.common.gris_claro,
-    borderRadius: BORDER_RADIUS.medium,
+    borderColor: COLORS.surface.borde_calido,
+    borderRadius: BORDER_RADIUS.small,
+    backgroundColor: COLORS.surface.fondo_crema,
     paddingHorizontal: SPACING.medium,
     paddingVertical: SPACING.medium,
     fontSize: FONT_SIZES.text_base,
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.medium,
     borderRadius: BORDER_RADIUS.extra_large,
     borderWidth: 1,
-    borderColor: COLORS.common.gris_claro,
+    borderColor: COLORS.surface.borde_calido,
   },
   cancelButtonText: {
     color: COLORS.common.gris_oscuro,

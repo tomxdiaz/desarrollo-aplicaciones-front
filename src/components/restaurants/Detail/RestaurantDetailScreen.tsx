@@ -8,6 +8,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { restaurantService } from '../../../services/restaurant.service';
 import { Restaurant } from '../../../types/types';
+import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 function parseTableCode(code: string) {
@@ -35,6 +36,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [scanned, setScanned] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
+  const { setRestaurantName } = useHeaderRestaurant();
 
   const goToMenu = (rawCode: string) => {
     const parsed = parseTableCode(rawCode);
@@ -79,6 +81,12 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
     fetchData();
   }, [id]);
+
+  // Publish the restaurant name to Header-1 while this screen is mounted.
+  useEffect(() => {
+    setRestaurantName(restaurant?.name ?? null);
+    return () => setRestaurantName(null);
+  }, [restaurant?.name, setRestaurantName]);
 
   if (scanning) {
     return (

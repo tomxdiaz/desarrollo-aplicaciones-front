@@ -28,10 +28,17 @@ const TableDetailPanel = ({
 
   return (
     <View style={styles.panel}>
-      <Text style={styles.title}>Mesa {table.code}</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Mesa {table.code}</Text>
+        <View style={styles.statusPill}>
+          <View style={[styles.dot, isFree ? styles.dotFree : styles.dotOccupied]} />
+          <Text style={[styles.statusText, isFree ? styles.statusFree : styles.statusOccupied]}>
+            {isFree ? 'Libre' : 'Activa'}
+          </Text>
+        </View>
+      </View>
       {table.area ? <Text style={styles.detail}>Área: {table.area}</Text> : null}
       <Text style={styles.detail}>Capacidad: {table.capacity} personas</Text>
-      <Text style={styles.detail}>Estado: {isFree ? 'Libre' : 'Activa'}</Text>
 
       {isFree ? (
         <>
@@ -65,13 +72,54 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.common.blanco,
     borderRadius: BORDER_RADIUS.medium,
     borderWidth: 1,
-    borderColor: COLORS.common.gris_claro,
+    borderColor: COLORS.surface.borde_calido,
     padding: SPACING.large,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: SPACING.small,
   },
   title: {
     fontSize: FONT_SIZES.title_small,
     fontWeight: '800',
     color: COLORS.common.negro_principal,
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.small,
+    paddingHorizontal: SPACING.small,
+    paddingVertical: SPACING.extra_small,
+    borderRadius: BORDER_RADIUS.large,
+    backgroundColor: COLORS.surface.fondo_crema,
+  },
+  dot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+  },
+  dotFree: {
+    backgroundColor: COLORS.surface.verde_texto,
+  },
+  dotOccupied: {
+    backgroundColor: COLORS.surface.rojo_texto,
+  },
+  statusText: {
+    fontSize: FONT_SIZES.text_small,
+    fontWeight: '700',
+  },
+  statusFree: {
+    color: COLORS.surface.verde_texto,
+  },
+  statusOccupied: {
+    color: COLORS.surface.rojo_texto,
   },
   detail: {
     fontSize: FONT_SIZES.text_base,

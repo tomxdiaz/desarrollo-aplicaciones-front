@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { canManageTables } from '../../../utils/staffPermissions';
 import { tableService } from '../../../services/table.service';
@@ -7,6 +8,7 @@ import { CreateTablePayload, RestaurantStaffEnum, RestaurantTable, RestaurantTab
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { ICON_SIZES } from '../../../constants/icon_sizes';
 import TableCard from './TableCard';
 import TableDetailPanel from './TableDetailPanel';
 import CreateTableModal from './CreateTableModal';
@@ -88,12 +90,26 @@ const RestaurantTablesScreen = ({
           ))}
           {canManage ? (
             <Pressable style={styles.addCard} onPress={() => setModalVisible(true)}>
-              <Text style={styles.addCardText}>+ Nueva</Text>
+              <Ionicons name='add' size={ICON_SIZES.large} color={COLORS.primary.caramelo} />
+              <Text style={styles.addCardText}>Nueva</Text>
             </Pressable>
           ) : null}
         </View>
 
         {tables.length === 0 ? <Text style={styles.emptyText}>Todavía no hay mesas cargadas</Text> : null}
+
+        {tables.length > 0 ? (
+          <View style={styles.legend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, styles.legendDotFree]} />
+              <Text style={styles.legendText}>Libre</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, styles.legendDotActive]} />
+              <Text style={styles.legendText}>Activa</Text>
+            </View>
+          </View>
+        ) : null}
 
         {selectedTable ? (
           <TableDetailPanel
@@ -128,9 +144,10 @@ const styles = StyleSheet.create({
     width: '47%',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 110,
+    gap: SPACING.extra_small,
+    minHeight: 120,
     borderRadius: BORDER_RADIUS.medium,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.primary.caramelo,
     borderStyle: 'dashed',
   },
@@ -144,6 +161,32 @@ const styles = StyleSheet.create({
     color: COLORS.common.gris_medio,
     textAlign: 'center',
     marginTop: SPACING.extra_large,
+  },
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.large,
+    marginTop: SPACING.large,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.small,
+  },
+  legendDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+  },
+  legendDotFree: {
+    backgroundColor: COLORS.surface.verde_texto,
+  },
+  legendDotActive: {
+    backgroundColor: COLORS.surface.rojo_texto,
+  },
+  legendText: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_oscuro,
   },
 });
 

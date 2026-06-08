@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { orderService } from '../../../services/order.service';
@@ -9,25 +9,28 @@ import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import OrderStatusFilterTabs from './OrderStatusFilterTabs';
 import StaffOrderCard from './StaffOrderCard';
+import StaffOrderDetailModal from './StaffOrderDetailModal';
 
 const RestaurantOrdersScreen = ({
   restaurantId,
   tables,
-  tableFilter,
-  onClearTableFilter,
+  openOrderForTable,
+  onOrderOpened,
 }: {
   restaurantId: string;
   tables: RestaurantTable[];
-  tableFilter: number | null;
-  onClearTableFilter: () => void;
+  openOrderForTable: number | null;
+  onOrderOpened: () => void;
 }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>(ALL_ORDER_STATUS_FILTER);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
   const tablesById = new Map(tables.map((table) => [table.id, table]));
+  const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
 
   const loadOrders = useCallback(async () => {
     try {
@@ -49,6 +52,26 @@ const RestaurantOrdersScreen = ({
     }, [loadOrders]),
   );
 
+  // When the user taps "Ver pedido" on an occupied table, jump straight to the
+  // detail of that table's latest active (pending / in process) order.
+  useEffect(() => {
+    if (openOrderForTable === null || loading) return;
+
+    const latestActive = orders
+      .filter(
+        (order) =>
+          order.table_id === openOrderForTable &&
+          (order.status === RestaurantOrderStatusEnum.PENDING || order.status === RestaurantOrderStatusEnum.IN_PROCESS),
+      )
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+
+    if (latestActive) {
+      setSelectedOrderId(latestActive.id);
+    }
+
+    onOrderOpened();
+  }, [openOrderForTable, loading, orders, onOrderOpened]);
+
   const handleRefresh = () => {
     setRefreshing(true);
     loadOrders();
@@ -64,13 +87,8 @@ const RestaurantOrdersScreen = ({
     }
   };
 
-  const filteredOrders = orders.filter((order) => {
-    if (tableFilter !== null && order.table_id !== tableFilter) return false;
-    if (statusFilter !== ALL_ORDER_STATUS_FILTER && order.status !== statusFilter) return false;
-    return true;
-  });
-
-  const filteredTable = tableFilter !== null ? tablesById.get(tableFilter) : undefined;
+  const filteredOrders =
+    statusFilter === ALL_ORDER_STATUS_FILTER ? orders : orders.filter((order) => order.status === statusFilter);
 
   if (loading) {
     return (
@@ -93,15 +111,6 @@ const RestaurantOrdersScreen = ({
 
   return (
     <View style={styles.container}>
-      {tableFilter !== null ? (
-        <View style={styles.filterChip}>
-          <Text style={styles.filterChipText}>Mesa {filteredTable?.code ?? tableFilter}</Text>
-          <Pressable onPress={onClearTableFilter}>
-            <Text style={styles.filterChipClear}>Quitar filtro ✕</Text>
-          </Pressable>
-        </View>
-      ) : null}
-
       <OrderStatusFilterTabs selected={statusFilter} onSelect={setStatusFilter} />
 
       <FlatList
@@ -110,10 +119,23 @@ const RestaurantOrdersScreen = ({
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={[COLORS.primary.terracota]} />}
         renderItem={({ item }) => (
-          <StaffOrderCard order={item} table={tablesById.get(item.table_id)} onUpdateStatus={handleUpdateStatus} />
+          <StaffOrderCard
+            order={item}
+            table={tablesById.get(item.table_id)}
+            onUpdateStatus={handleUpdateStatus}
+            onPress={() => setSelectedOrderId(item.id)}
+          />
         )}
         ItemSeparatorComponent={() => <View style={{ height: SPACING.small }} />}
         ListEmptyComponent={<Text style={styles.emptyText}>No hay pedidos en esta categoría</Text>}
+      />
+
+      <StaffOrderDetailModal
+        order={selectedOrder}
+        table={selectedOrder ? tablesById.get(selectedOrder.table_id) : undefined}
+        visible={selectedOrder !== null}
+        onClose={() => setSelectedOrderId(null)}
+        onUpdateStatus={handleUpdateStatus}
       />
     </View>
   );
@@ -144,29 +166,6 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: COLORS.common.blanco,
     fontWeight: '700',
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: SPACING.medium,
-    marginTop: SPACING.small,
-    paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.small,
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: `${COLORS.primary.arena_calida}66`,
-    borderWidth: 1,
-    borderColor: COLORS.primary.caramelo,
-  },
-  filterChipText: {
-    fontSize: FONT_SIZES.text_small,
-    fontWeight: '700',
-    color: COLORS.primary.caramelo,
-  },
-  filterChipClear: {
-    fontSize: FONT_SIZES.text_small,
-    fontWeight: '700',
-    color: COLORS.primary.caramelo,
   },
   listContent: {
     padding: SPACING.medium,

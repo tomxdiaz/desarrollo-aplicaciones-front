@@ -1,13 +1,18 @@
+import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../../constants/colors';
-import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
+import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { ICON_SIZES } from '../../../constants/icon_sizes';
 
 export type StaffTabKey = 'orders' | 'tables';
 
-const STAFF_TABS: { key: StaffTabKey; label: string }[] = [
-  { key: 'orders', label: 'Pedidos' },
-  { key: 'tables', label: 'Mesas' },
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+const STAFF_TABS: { key: StaffTabKey; label: string; icon: IconName }[] = [
+  { key: 'orders', label: 'Pedidos', icon: 'format-list-bulleted' },
+  { key: 'tables', label: 'Mesas', icon: 'view-grid-outline' },
 ];
 
 const StaffTabs = ({ activeTab, onSelect }: { activeTab: StaffTabKey; onSelect: (tab: StaffTabKey) => void }) => {
@@ -15,14 +20,15 @@ const StaffTabs = ({ activeTab, onSelect }: { activeTab: StaffTabKey; onSelect: 
     <View style={styles.container}>
       {STAFF_TABS.map((tab) => {
         const isActive = activeTab === tab.key;
+        const color = isActive ? COLORS.primary.terracota : COLORS.common.gris_medio;
 
         return (
-          <Pressable
-            key={tab.key}
-            style={[styles.tab, isActive ? styles.tabActive : styles.tabInactive]}
-            onPress={() => onSelect(tab.key)}
-          >
-            <Text style={[styles.tabText, isActive ? styles.tabTextActive : styles.tabTextInactive]}>{tab.label}</Text>
+          <Pressable key={tab.key} style={styles.tab} onPress={() => onSelect(tab.key)}>
+            <View style={styles.tabInner}>
+              <MaterialCommunityIcons name={tab.icon} size={ICON_SIZES.small} color={color} />
+              <Text style={[styles.tabText, { color }]}>{tab.label}</Text>
+            </View>
+            <View style={[styles.underline, isActive && styles.underlineActive]} />
           </Pressable>
         );
       })}
@@ -33,33 +39,33 @@ const StaffTabs = ({ activeTab, onSelect }: { activeTab: StaffTabKey; onSelect: 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: SPACING.small,
     paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.small,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.surface.borde_calido,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: SPACING.small,
-    borderRadius: BORDER_RADIUS.extra_large,
   },
-  tabActive: {
-    backgroundColor: COLORS.primary.terracota,
-  },
-  tabInactive: {
-    backgroundColor: COLORS.common.blanco,
-    borderWidth: 1,
-    borderColor: COLORS.primary.terracota,
+  tabInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.small,
+    paddingVertical: SPACING.medium,
   },
   tabText: {
     fontSize: FONT_SIZES.text_base,
     fontWeight: '700',
   },
-  tabTextActive: {
-    color: COLORS.common.blanco,
+  underline: {
+    alignSelf: 'stretch',
+    height: 3,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    backgroundColor: 'transparent',
   },
-  tabTextInactive: {
-    color: COLORS.primary.terracota,
+  underlineActive: {
+    backgroundColor: COLORS.primary.terracota,
   },
 });
 

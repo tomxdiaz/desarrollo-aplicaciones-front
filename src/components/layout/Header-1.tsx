@@ -1,5 +1,5 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { Image, StyleSheet, View, Text, Touchable, TouchableOpacity, Pressable } from 'react-native';
+import { Image, StyleSheet, View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
@@ -8,6 +8,7 @@ import { Drawer } from './Drawer';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { ICON_SIZES } from '../../constants/icon_sizes';
 import { router } from 'expo-router';
+import { useHeaderRestaurant } from '../../providers/header-restaurant.provider';
 
 SplashScreen.setOptions({
   duration: 3000,
@@ -16,6 +17,7 @@ SplashScreen.setOptions({
 
 export default function Header1() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { restaurantName } = useHeaderRestaurant();
 
   const handleToggleDrawer = () => {
     setDrawerOpen((prev) => !prev);
@@ -23,19 +25,25 @@ export default function Header1() {
 
   return (
     <View style={styles.header}>
-      <Pressable
-        onPress={() => {
-          if (router.canGoBack()) {
-            router.back();
-          }
-        }}>
-        <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
-      </Pressable>
-      <View style={styles.logoTitleContainer}>
-        <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
-        <View>
-          <Text style={styles.title}>Provecho!</Text>
-          <Text style={styles.slogan}>Hola soy el eslogan</Text>
+      <View style={styles.leftGroup}>
+        <Pressable
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            }
+          }}>
+          <AntDesign name='arrow-left' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
+        </Pressable>
+        <View style={styles.logoTitleContainer}>
+          <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
+          <View style={styles.titleGroup}>
+            <Text style={styles.title}>Provecho!</Text>
+            {restaurantName ? (
+              <Text style={styles.subtitle} numberOfLines={1}>
+                {restaurantName}
+              </Text>
+            ) : null}
+          </View>
         </View>
       </View>
       <TouchableOpacity onPress={handleToggleDrawer} style={styles.drawerButton}>
@@ -56,7 +64,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary.terracota,
     padding: SPACING.medium,
   },
+  leftGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.small,
+    marginRight: SPACING.small,
+  },
   logoTitleContainer: {
+    flexShrink: 1,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -67,14 +83,18 @@ const styles = StyleSheet.create({
     height: 60,
     resizeMode: 'contain',
   },
+  titleGroup: {
+    flexShrink: 1,
+  },
   title: {
     color: COLORS.common.blanco,
     fontSize: FONT_SIZES.title_small,
     fontWeight: 'bold',
   },
-  slogan: {
+  subtitle: {
     color: COLORS.common.blanco,
     fontSize: FONT_SIZES.text_small,
+    opacity: 0.9,
   },
   drawerButton: {
     display: 'flex',

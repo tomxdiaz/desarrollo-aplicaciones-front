@@ -12,7 +12,12 @@ const OrderStatusFilterTabs = ({
   onSelect: (filter: OrderStatusFilter) => void;
 }) => {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.container}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+    >
       {ORDER_STATUS_FILTER_OPTIONS.map((option) => {
         const isActive = selected === option.key;
 
@@ -22,7 +27,12 @@ const OrderStatusFilterTabs = ({
             style={[styles.tab, isActive ? styles.tabActive : styles.tabInactive]}
             onPress={() => onSelect(option.key)}
           >
-            <Text style={[styles.tabText, isActive ? styles.tabTextActive : styles.tabTextInactive]}>{option.label}</Text>
+            <Text
+              style={[styles.tabText, isActive ? styles.tabTextActive : styles.tabTextInactive]}
+              numberOfLines={1}
+            >
+              {option.label}
+            </Text>
           </Pressable>
         );
       })}
@@ -31,23 +41,32 @@ const OrderStatusFilterTabs = ({
 };
 
 const styles = StyleSheet.create({
+  // Keep the row from stretching to fill vertical space (otherwise the
+  // chips blow up to the full height of the parent flex column).
+  scroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   container: {
+    alignItems: 'center',
     gap: SPACING.small,
     paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.extra_small,
+    paddingVertical: SPACING.small,
   },
   tab: {
+    height: 34,
+    justifyContent: 'center',
     paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.small,
-    borderRadius: BORDER_RADIUS.extra_large,
+    borderRadius: BORDER_RADIUS.large,
+    borderWidth: 1,
   },
   tabActive: {
     backgroundColor: COLORS.primary.terracota,
+    borderColor: COLORS.primary.terracota,
   },
   tabInactive: {
     backgroundColor: COLORS.common.blanco,
-    borderWidth: 1,
-    borderColor: COLORS.primary.terracota,
+    borderColor: COLORS.surface.borde_calido,
   },
   tabText: {
     fontSize: FONT_SIZES.text_small,
