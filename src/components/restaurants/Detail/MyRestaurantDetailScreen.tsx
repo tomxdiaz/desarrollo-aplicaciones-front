@@ -6,10 +6,11 @@ import { useHeaderRestaurant } from '../../../providers/header-restaurant.provid
 import { Restaurant, RestaurantStaff } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
+import { canManageMenu, canManageStaff } from '../../../utils/staffPermissions';
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
-import StaffTabs, { StaffTabKey } from '../Staff/StaffTabs';
+import StaffTabs, { StaffTab, StaffTabKey, STAFF_TABS } from '../Staff/StaffTabs';
 import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
 
@@ -101,31 +102,58 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
 
   const tables = myRestaurant.tables ?? [];
 
+  const visibleTabs: StaffTab[] = STAFF_TABS.filter((tab) => {
+    if (tab.key === 'menu') return canManageMenu(myRestaurantStaffInfo.role);
+    if (tab.key === 'staff') return canManageStaff(myRestaurantStaffInfo.role);
+    return true;
+  });
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'orders':
+        return (
+          <RestaurantOrdersScreen
+            restaurantId={id}
+            tables={tables}
+            openOrderForTable={openOrderForTable}
+            onOrderOpened={handleOrderOpened}
+          />
+        );
+      case 'tables':
+        return (
+          <RestaurantTablesScreen
+            restaurantId={id}
+            staffRole={myRestaurantStaffInfo.role}
+            tables={tables}
+            onTablesChange={handleTablesChange}
+            onRefresh={refreshRestaurant}
+            onViewOrdersForTable={handleViewOrdersForTable}
+          />
+        );
+      case 'menu':
+        return (
+          <View style={styles.centered}>
+            <Text style={styles.message}>Menu Administration - Coming Soon</Text>
+          </View>
+        );
+      case 'staff':
+        return (
+          <View style={styles.centered}>
+            <Text style={styles.message}>Staff Administration - Coming Soon</Text>
+          </View>
+        );
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.restaurantName}>{myRestaurant.name}</Text>
       </View>
 
-      <StaffTabs activeTab={activeTab} onSelect={setActiveTab} />
+      <StaffTabs tabs={visibleTabs} activeTab={activeTab} onSelect={setActiveTab} />
 
-      {activeTab === 'orders' ? (
-        <RestaurantOrdersScreen
-          restaurantId={id}
-          tables={tables}
-          openOrderForTable={openOrderForTable}
-          onOrderOpened={handleOrderOpened}
-        />
-      ) : (
-        <RestaurantTablesScreen
-          restaurantId={id}
-          staffRole={myRestaurantStaffInfo.role}
-          tables={tables}
-          onTablesChange={handleTablesChange}
-          onRefresh={refreshRestaurant}
-          onViewOrdersForTable={handleViewOrdersForTable}
-        />
-      )}
+      {renderActiveTab()}
     </View>
   );
 };

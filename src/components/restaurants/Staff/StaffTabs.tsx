@@ -6,19 +6,31 @@ import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 
-export type StaffTabKey = 'orders' | 'tables';
+export type StaffTabKey = 'orders' | 'tables' | 'menu' | 'staff';
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-const STAFF_TABS: { key: StaffTabKey; label: string; icon: IconName }[] = [
+export type StaffTab = { key: StaffTabKey; label: string; icon: IconName };
+
+export const STAFF_TABS: StaffTab[] = [
   { key: 'orders', label: 'Pedidos', icon: 'format-list-bulleted' },
   { key: 'tables', label: 'Mesas', icon: 'view-grid-outline' },
+  { key: 'menu', label: 'Menú', icon: 'silverware-fork-knife' },
+  { key: 'staff', label: 'Personal', icon: 'account-group-outline' },
 ];
 
-const StaffTabs = ({ activeTab, onSelect }: { activeTab: StaffTabKey; onSelect: (tab: StaffTabKey) => void }) => {
+const StaffTabs = ({
+  tabs,
+  activeTab,
+  onSelect,
+}: {
+  tabs: StaffTab[];
+  activeTab: StaffTabKey;
+  onSelect: (tab: StaffTabKey) => void;
+}) => {
   return (
     <View style={styles.container}>
-      {STAFF_TABS.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
         const color = isActive ? COLORS.primary.terracota : COLORS.common.gris_medio;
 
