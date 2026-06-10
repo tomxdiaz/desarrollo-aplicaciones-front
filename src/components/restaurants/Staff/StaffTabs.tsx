@@ -6,13 +6,14 @@ import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 
-export type StaffTabKey = 'orders' | 'tables';
+export type StaffTabKey = 'orders' | 'tables' | 'menu';
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 const STAFF_TABS: { key: StaffTabKey; label: string; icon: IconName }[] = [
   { key: 'orders', label: 'Pedidos', icon: 'format-list-bulleted' },
   { key: 'tables', label: 'Mesas', icon: 'view-grid-outline' },
+  { key: 'menu', label: 'Menu', icon: 'silverware-fork-knife' },
 ];
 
 const StaffTabs = ({ activeTab, onSelect }: { activeTab: StaffTabKey; onSelect: (tab: StaffTabKey) => void }) => {
