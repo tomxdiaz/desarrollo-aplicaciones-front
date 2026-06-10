@@ -1,5 +1,5 @@
 import { apiClient } from '../lib/apiClient';
-import { Restaurant } from '../types/types';
+import { CreateRestaurantPayload, Restaurant } from '../types/types';
 
 export const restaurantService = {
   getAllRestaurants: async () => {
@@ -16,6 +16,14 @@ export const restaurantService = {
 
   getMyRestaurants: async () => {
     return apiClient<Restaurant[]>('/restaurant/me', {
+      requireAuth: true,
+    });
+  },
+
+  createRestaurant: async (payload: CreateRestaurantPayload) => {
+    return apiClient<Restaurant>('/restaurant', {
+      method: 'POST',
+      body: payload,
       requireAuth: true,
     });
   },

@@ -24,7 +24,12 @@ const MyRestaurantsListScreen = () => {
     return;
   }
 
-  return <MyRestaurantsList restaurants={restaurants} />;
+  return (
+    <MyRestaurantsList
+      restaurants={restaurants}
+      onRestaurantCreated={(restaurant) => setRestaurants((current) => [...current, restaurant])}
+    />
+  );
 };
 
 export default MyRestaurantsListScreen;
