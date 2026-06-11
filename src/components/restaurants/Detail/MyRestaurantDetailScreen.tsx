@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
-
-import { Restaurant, RestaurantStaff } from '../../../types/types';
+import { useAuth } from '../../../providers/auth.provider';
+import { AppRoleEnum, Restaurant, RestaurantStaff, RestaurantStaffEnum } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
 import { canManageMenu, canManageStaff } from '../../../utils/staffPermissions';
@@ -13,9 +13,14 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import StaffTabs, { StaffTab, StaffTabKey, STAFF_TABS } from '../Staff/StaffTabs';
 import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
+<<<<<<< HEAD
 import RestaurantStaffScreen from '../Staff/RestaurantStaffScreen';
+=======
+import RestaurantMenuManagementScreen from '../Staff/RestaurantMenuManagementScreen';
+>>>>>>> origin/dev
 
 const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
+  const { appUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [myRestaurant, setMyRestaurant] = useState<Restaurant | null>(null);
   const [myRestaurantStaffInfo, setMyRestaurantStaffInfo] = useState<RestaurantStaff | null>(null);
@@ -24,12 +29,23 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const { setRestaurantName } = useHeaderRestaurant();
 
   const loadData = useCallback(async () => {
+    let restaurant: Restaurant;
+
     try {
-      const restaurant = await restaurantService.getRestaurantById(id);
+      restaurant = await restaurantService.getRestaurantById(id);
       setMyRestaurant(restaurant);
     } catch (error) {
       console.error('Error fetching restaurant:', error);
       setMyRestaurant(null);
+      setLoading(false);
+      return;
+    }
+
+    const isRestaurantOwner = Boolean(appUser && appUser.id === restaurant.owner_id);
+    const isSuperUser = appUser?.global_role === AppRoleEnum.SUPER_USER;
+
+    if (isRestaurantOwner || isSuperUser) {
+      setMyRestaurantStaffInfo(null);
       setLoading(false);
       return;
     }
@@ -43,7 +59,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [appUser, id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +67,6 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     }, [loadData]),
   );
 
-  // Publish the restaurant name to Header-1 while this screen is mounted.
   useEffect(() => {
     setRestaurantName(myRestaurant?.name ?? null);
     return () => setRestaurantName(null);
@@ -93,10 +108,15 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     );
   }
 
-  if (!myRestaurantStaffInfo) {
+  const isRestaurantOwner = Boolean(appUser && appUser.id === myRestaurant.owner_id);
+  const isSuperUser = appUser?.global_role === AppRoleEnum.SUPER_USER;
+  const effectiveStaffRole =
+    myRestaurantStaffInfo?.role ?? (isRestaurantOwner || isSuperUser ? RestaurantStaffEnum.OWNER : null);
+
+  if (!effectiveStaffRole) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.message}>No formás parte de este restaurante</Text>
+        <Text style={styles.message}>No formas parte de este restaurante</Text>
       </View>
     );
   }
@@ -155,7 +175,34 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
 
       <StaffTabs tabs={visibleTabs} activeTab={activeTab} onSelect={setActiveTab} />
 
+<<<<<<< HEAD
       {renderActiveTab()}
+=======
+      {activeTab === 'orders' ? (
+        <RestaurantOrdersScreen
+          restaurantId={id}
+          tables={tables}
+          openOrderForTable={openOrderForTable}
+          onOrderOpened={handleOrderOpened}
+        />
+      ) : activeTab === 'tables' ? (
+        <RestaurantTablesScreen
+          restaurantId={id}
+          staffRole={effectiveStaffRole}
+          tables={tables}
+          onTablesChange={handleTablesChange}
+          onRefresh={refreshRestaurant}
+          onViewOrdersForTable={handleViewOrdersForTable}
+        />
+      ) : (
+        <RestaurantMenuManagementScreen
+          restaurantId={id}
+          staffRole={effectiveStaffRole}
+          menu={myRestaurant.menu}
+          onRefresh={refreshRestaurant}
+        />
+      )}
+>>>>>>> origin/dev
     </View>
   );
 };
