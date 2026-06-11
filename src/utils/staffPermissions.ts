@@ -25,6 +25,26 @@ export const getStaffRoleRank = (role: RestaurantStaffEnum): number => {
 };
 
 // UX gate only — backend re-enforces this server-side.
+export const getAssignableRoles = (role: RestaurantStaffEnum): RestaurantStaffEnum[] => {
+  if (role === RestaurantStaffEnum.OWNER) {
+    return [
+      RestaurantStaffEnum.ADMIN,
+      RestaurantStaffEnum.CASHIER_PLUS,
+      RestaurantStaffEnum.CASHIER,
+    ];
+  }
+
+  if (role === RestaurantStaffEnum.ADMIN) {
+    return [
+      RestaurantStaffEnum.CASHIER_PLUS,
+      RestaurantStaffEnum.CASHIER,
+    ];
+  }
+
+  return [];
+};
+
+// UX gate only — backend re-enforces this server-side.
 export const canManageMember = (
   myRole: RestaurantStaffEnum,
   theirRole: RestaurantStaffEnum,

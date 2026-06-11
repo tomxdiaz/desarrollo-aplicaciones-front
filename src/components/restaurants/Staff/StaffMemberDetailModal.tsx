@@ -1,24 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { canManageMember } from '../../../utils/staffPermissions';
+import { canManageMember, getAssignableRoles } from '../../../utils/staffPermissions';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { RestaurantStaff, RestaurantStaffEnum } from '../../../types/types';
 import { RESTAURANT_STAFF_ROLE_LABELS, getRestaurantStaffRoleStyle } from '../../../types/restaurant-staff-role';
-
-const OWNER_ASSIGNABLE_ROLES: RestaurantStaffEnum[] = [
-  RestaurantStaffEnum.ADMIN,
-  RestaurantStaffEnum.CASHIER_PLUS,
-  RestaurantStaffEnum.CASHIER,
-];
-
-const ADMIN_ASSIGNABLE_ROLES: RestaurantStaffEnum[] = [
-  RestaurantStaffEnum.CASHIER_PLUS,
-  RestaurantStaffEnum.CASHIER,
-];
 
 const StaffMemberDetailModal = ({
   member,
@@ -63,8 +52,7 @@ const StaffMemberDetailModal = ({
 
   const isSelf = member?.user_id === currentUserId;
   const canManage = !isSelf && !!member && canManageMember(currentUserRole, member.role);
-  const assignableRoles =
-    currentUserRole === RestaurantStaffEnum.OWNER ? OWNER_ASSIGNABLE_ROLES : ADMIN_ASSIGNABLE_ROLES;
+  const assignableRoles = getAssignableRoles(currentUserRole);
 
   const roleStyle = member ? getRestaurantStaffRoleStyle(member.role) : null;
   const roleColor = roleStyle?.color ?? COLORS.common.gris_oscuro;

@@ -6,17 +6,7 @@ import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { CreateStaffPayload, RestaurantStaffEnum } from '../../../types/types';
 import { RESTAURANT_STAFF_ROLE_LABELS } from '../../../types/restaurant-staff-role';
-
-const OWNER_ASSIGNABLE_ROLES: RestaurantStaffEnum[] = [
-  RestaurantStaffEnum.ADMIN,
-  RestaurantStaffEnum.CASHIER_PLUS,
-  RestaurantStaffEnum.CASHIER,
-];
-
-const ADMIN_ASSIGNABLE_ROLES: RestaurantStaffEnum[] = [
-  RestaurantStaffEnum.CASHIER_PLUS,
-  RestaurantStaffEnum.CASHIER,
-];
+import { getAssignableRoles } from '../../../utils/staffPermissions';
 
 const AddStaffModal = ({
   visible,
@@ -34,8 +24,7 @@ const AddStaffModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
 
-  const assignableRoles =
-    currentUserRole === RestaurantStaffEnum.OWNER ? OWNER_ASSIGNABLE_ROLES : ADMIN_ASSIGNABLE_ROLES;
+  const assignableRoles = getAssignableRoles(currentUserRole);
 
   const reset = () => {
     setEmail('');
