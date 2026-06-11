@@ -1,6 +1,9 @@
 import { apiClient } from '../lib/apiClient';
-import { CreateOrderPayload } from '../types/order.types';
-import { Order, RestaurantOrderStatusEnum } from '../types/types';
+import {
+  CreateOrderPayload,
+  Order,
+  OrderStatus,
+} from '../types/order.types';
 
 export const orderService = {
   getRestaurantOrders: async (restaurantId: string) => {
@@ -9,7 +12,7 @@ export const orderService = {
     });
   },
 
-  updateOrderStatus: async (restaurantId: string, orderId: string, status: RestaurantOrderStatusEnum) => {
+  updateOrderStatus: async (restaurantId: string, orderId: string, status: OrderStatus) => {
     return apiClient<Order>(`/restaurants/${restaurantId}/orders/${orderId}/status`, {
       method: 'PATCH',
       requireAuth: true,

@@ -6,7 +6,8 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { formatPrice } from '../../../utils/menu';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../../types/restaurant-order-status';
-import { Order, RestaurantOrderStatusEnum, RestaurantTable } from '../../../types/types';
+import { Order, OrderStatus } from '../../../types/order.types';
+import { RestaurantTable } from '../../../types/types';
 
 const formatElapsed = (createdAt: string) => {
   const minutes = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000));
@@ -25,7 +26,7 @@ const StaffOrderCard = ({
 }: {
   order: Order;
   table: RestaurantTable | undefined;
-  onUpdateStatus: (order: Order, status: RestaurantOrderStatusEnum) => void;
+  onUpdateStatus: (order: Order, status: OrderStatus) => void;
   onPress: () => void;
 }) => {
   const tableLabel = table ? `Mesa ${table.code}` : 'Mesa eliminada';
@@ -34,7 +35,7 @@ const StaffOrderCard = ({
   const handleCancel = () => {
     Alert.alert('Cancelar pedido', `¿Cancelar el pedido #${order.number}?`, [
       { text: 'No', style: 'cancel' },
-      { text: 'Sí, cancelar', style: 'destructive', onPress: () => onUpdateStatus(order, RestaurantOrderStatusEnum.CANCELLED) },
+      { text: 'Sí, cancelar', style: 'destructive', onPress: () => onUpdateStatus(order, 'CANCELLED') },
     ]);
   };
 
@@ -69,24 +70,24 @@ const StaffOrderCard = ({
         <Text style={styles.total}>{formatPrice(order.total)}</Text>
       </View>
 
-      {order.status === RestaurantOrderStatusEnum.PENDING ? (
+      {order.status === 'PENDING' ? (
         <View style={styles.actionsRow}>
           <Pressable style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </Pressable>
           <Pressable
             style={styles.primaryButton}
-            onPress={() => onUpdateStatus(order, RestaurantOrderStatusEnum.IN_PROCESS)}
+            onPress={() => onUpdateStatus(order, 'IN_PROCESS')}
           >
             <Text style={styles.primaryButtonText}>Enviar a cocina</Text>
           </Pressable>
         </View>
       ) : null}
 
-      {order.status === RestaurantOrderStatusEnum.IN_PROCESS ? (
+      {order.status === 'IN_PROCESS' ? (
         <Pressable
           style={[styles.primaryButton, styles.servedButton]}
-          onPress={() => onUpdateStatus(order, RestaurantOrderStatusEnum.DELIVERED)}
+          onPress={() => onUpdateStatus(order, 'DELIVERED')}
         >
           <Text style={styles.primaryButtonText}>Marcar entregado</Text>
         </Pressable>

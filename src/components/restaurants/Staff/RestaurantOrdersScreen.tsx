@@ -3,7 +3,8 @@ import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleShe
 import { useFocusEffect } from '@react-navigation/native';
 import { orderService } from '../../../services/order.service';
 import { ALL_ORDER_STATUS_FILTER, OrderStatusFilter } from '../../../types/restaurant-order-status';
-import { Order, RestaurantOrderStatusEnum, RestaurantTable } from '../../../types/types';
+import { Order, OrderStatus } from '../../../types/order.types';
+import { RestaurantTable } from '../../../types/types';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
@@ -61,7 +62,7 @@ const RestaurantOrdersScreen = ({
       .filter(
         (order) =>
           order.table_id === openOrderForTable &&
-          (order.status === RestaurantOrderStatusEnum.PENDING || order.status === RestaurantOrderStatusEnum.IN_PROCESS),
+          (order.status === 'PENDING' || order.status === 'IN_PROCESS'),
       )
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
@@ -77,7 +78,7 @@ const RestaurantOrdersScreen = ({
     loadOrders();
   };
 
-  const handleUpdateStatus = async (order: Order, status: RestaurantOrderStatusEnum) => {
+  const handleUpdateStatus = async (order: Order, status: OrderStatus) => {
     try {
       const updated = await orderService.updateOrderStatus(restaurantId, String(order.id), status);
       setOrders((current) => current.map((item) => (item.id === updated.id ? updated : item)));

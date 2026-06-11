@@ -4,7 +4,7 @@ import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import { router } from 'expo-router';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../types/restaurant-order-status';
-import { Order } from '../../types/types';
+import { Order } from '../../types/order.types';
 
 const OrderCard = ({
   order,
@@ -23,7 +23,6 @@ const OrderCard = ({
         <Text style={styles.id}>#{order.id}</Text>
         <Text style={[styles.status, getRestaurantOrderStatusStyle(order.status)]}>{RESTAURANT_ORDER_STATUS_LABELS[order.status]}</Text>
       </View>
-      {order.restaurant && <Text style={styles.restaurant}>{order.restaurant.name}</Text>}
       <View style={styles.actionsRow}>
         <Text style={styles.total}>${order.total.toFixed(2)}</Text>
         <View style={styles.actionsGroup}>
@@ -84,11 +83,6 @@ const styles = StyleSheet.create({
   status: {
     fontSize: FONT_SIZES.text_small,
     fontWeight: '700',
-  },
-  restaurant: {
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.gris_oscuro,
-    marginVertical: SPACING.small,
   },
   total: {
     fontSize: FONT_SIZES.text_base,

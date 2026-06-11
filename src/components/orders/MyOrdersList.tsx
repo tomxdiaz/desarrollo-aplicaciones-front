@@ -5,7 +5,7 @@ import { COLORS } from '../../constants/colors';
 import OrderCard from './OrderCard';
 import { useState } from 'react';
 import { ALL_ORDER_STATUS_FILTER, ORDER_STATUS_FILTER_OPTIONS, OrderStatusFilter } from '../../types/restaurant-order-status';
-import { Order } from '../../types/types';
+import { Order } from '../../types/order.types';
 
 const MyOrdersList = ({
   orders,

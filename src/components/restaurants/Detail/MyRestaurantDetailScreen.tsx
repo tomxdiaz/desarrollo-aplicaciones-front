@@ -13,11 +13,8 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import StaffTabs, { StaffTab, StaffTabKey, STAFF_TABS } from '../Staff/StaffTabs';
 import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
-<<<<<<< HEAD
 import RestaurantStaffScreen from '../Staff/RestaurantStaffScreen';
-=======
 import RestaurantMenuManagementScreen from '../Staff/RestaurantMenuManagementScreen';
->>>>>>> origin/dev
 
 const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const { appUser } = useAuth();
@@ -121,90 +118,78 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     );
   }
 
-  const tables = myRestaurant.tables ?? [];
-
   const visibleTabs: StaffTab[] = STAFF_TABS.filter((tab) => {
-    if (tab.key === 'menu') return canManageMenu(myRestaurantStaffInfo.role);
-    if (tab.key === 'staff') return canManageStaff(myRestaurantStaffInfo.role);
+    if (tab.key === 'menu') return canManageMenu(effectiveStaffRole);
+    if (tab.key === 'staff') return canManageStaff(effectiveStaffRole);
     return true;
   });
-
+  
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'orders':
         return (
           <RestaurantOrdersScreen
             restaurantId={id}
-            tables={tables}
+            tables={myRestaurant.tables ?? []}
             openOrderForTable={openOrderForTable}
             onOrderOpened={handleOrderOpened}
           />
         );
+  
       case 'tables':
         return (
           <RestaurantTablesScreen
             restaurantId={id}
-            staffRole={myRestaurantStaffInfo.role}
-            tables={tables}
+            staffRole={effectiveStaffRole}
+            tables={myRestaurant.tables ?? []}
             onTablesChange={handleTablesChange}
             onRefresh={refreshRestaurant}
             onViewOrdersForTable={handleViewOrdersForTable}
           />
         );
+  
       case 'menu':
         return (
-          <View style={styles.centered}>
-            <Text style={styles.message}>Menu Administration - Coming Soon</Text>
-          </View>
+          <RestaurantMenuManagementScreen
+            restaurantId={id}
+            staffRole={effectiveStaffRole}
+            menu={myRestaurant.menu}
+            onRefresh={refreshRestaurant}
+          />
         );
+  
       case 'staff':
-        return (
+        return myRestaurantStaffInfo ? (
           <RestaurantStaffScreen
             restaurantId={id}
             currentUserStaffInfo={myRestaurantStaffInfo}
           />
+        ) : (
+          <View style={styles.centered}>
+            <Text style={styles.message}>
+              El propietario no tiene gestión de personal
+            </Text>
+          </View>
         );
     }
   };
-
+  
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.restaurantName}>{myRestaurant.name}</Text>
       </View>
-
-      <StaffTabs tabs={visibleTabs} activeTab={activeTab} onSelect={setActiveTab} />
-
-<<<<<<< HEAD
+  
+      <StaffTabs
+        tabs={visibleTabs}
+        activeTab={activeTab}
+        onSelect={setActiveTab}
+      />
+  
       {renderActiveTab()}
-=======
-      {activeTab === 'orders' ? (
-        <RestaurantOrdersScreen
-          restaurantId={id}
-          tables={tables}
-          openOrderForTable={openOrderForTable}
-          onOrderOpened={handleOrderOpened}
-        />
-      ) : activeTab === 'tables' ? (
-        <RestaurantTablesScreen
-          restaurantId={id}
-          staffRole={effectiveStaffRole}
-          tables={tables}
-          onTablesChange={handleTablesChange}
-          onRefresh={refreshRestaurant}
-          onViewOrdersForTable={handleViewOrdersForTable}
-        />
-      ) : (
-        <RestaurantMenuManagementScreen
-          restaurantId={id}
-          staffRole={effectiveStaffRole}
-          menu={myRestaurant.menu}
-          onRefresh={refreshRestaurant}
-        />
-      )}
->>>>>>> origin/dev
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({

@@ -6,11 +6,7 @@ import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 
-<<<<<<< HEAD
 export type StaffTabKey = 'orders' | 'tables' | 'menu' | 'staff';
-=======
-export type StaffTabKey = 'orders' | 'tables' | 'menu';
->>>>>>> origin/dev
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -19,12 +15,8 @@ export type StaffTab = { key: StaffTabKey; label: string; icon: IconName };
 export const STAFF_TABS: StaffTab[] = [
   { key: 'orders', label: 'Pedidos', icon: 'format-list-bulleted' },
   { key: 'tables', label: 'Mesas', icon: 'view-grid-outline' },
-<<<<<<< HEAD
-  { key: 'menu', label: 'Menú', icon: 'silverware-fork-knife' },
-  { key: 'staff', label: 'Personal', icon: 'account-group-outline' },
-=======
   { key: 'menu', label: 'Menu', icon: 'silverware-fork-knife' },
->>>>>>> origin/dev
+  { key: 'staff', label: 'Personal', icon: 'account-group-outline' },
 ];
 
 const StaffTabs = ({

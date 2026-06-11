@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { orderService } from '../../services/order.service';
 import MyOrdersList from './MyOrdersList';
-import { Order } from '../../types/types';
+import { Order } from '../../types/order.types';
 
 const MyOrdersListScreen = () => {
   const [orders, setOrders] = useState<Order[]>([]);
