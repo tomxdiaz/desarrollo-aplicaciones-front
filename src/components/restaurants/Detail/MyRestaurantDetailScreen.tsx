@@ -13,6 +13,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import StaffTabs, { StaffTab, StaffTabKey, STAFF_TABS } from '../Staff/StaffTabs';
 import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
+import RestaurantStaffScreen from '../Staff/RestaurantStaffScreen';
 
 const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
@@ -138,9 +139,10 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
         );
       case 'staff':
         return (
-          <View style={styles.centered}>
-            <Text style={styles.message}>Staff Administration - Coming Soon</Text>
-          </View>
+          <RestaurantStaffScreen
+            restaurantId={id}
+            currentUserStaffInfo={myRestaurantStaffInfo}
+          />
         );
     }
   };
