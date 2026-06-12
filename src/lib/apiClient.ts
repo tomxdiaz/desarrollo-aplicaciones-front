@@ -70,6 +70,7 @@ axiosInstance.interceptors.request.use(
       }
 
       config.headers.Authorization = `Bearer ${accessToken}`;
+      console.log('[apiClient] Sending token (first 20 chars):', accessToken?.slice(0, 20));
     }
 
     delete config.headers.requireAuth;
@@ -82,8 +83,22 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<BackendError>) => {
-    // Hacer sign out si el token esta expirado
-    if (error.response?.status === 401) {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const { data, error: refreshError } = await supabase.auth.refreshSession();
+
+      if (!refreshError && data.session) {
+        accessToken = data.session.access_token;
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${accessToken}`,
+        };
+        return axiosInstance.request(originalRequest);
+      }
+
       await supabase.auth.signOut();
     }
 

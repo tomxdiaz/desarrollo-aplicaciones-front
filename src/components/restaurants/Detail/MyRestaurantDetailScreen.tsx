@@ -158,19 +158,20 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
           />
         );
   
-      case 'staff':
-        return myRestaurantStaffInfo ? (
+      case 'staff': {
+        const staffInfo = myRestaurantStaffInfo ?? {
+          id: 0,
+          user_id: appUser!.id,
+          restaurant_id: myRestaurant.id,
+          role: RestaurantStaffEnum.OWNER,
+        };
+        return (
           <RestaurantStaffScreen
             restaurantId={id}
-            currentUserStaffInfo={myRestaurantStaffInfo}
+            currentUserStaffInfo={staffInfo}
           />
-        ) : (
-          <View style={styles.centered}>
-            <Text style={styles.message}>
-              El propietario no tiene gestión de personal
-            </Text>
-          </View>
         );
+      }
     }
   };
   

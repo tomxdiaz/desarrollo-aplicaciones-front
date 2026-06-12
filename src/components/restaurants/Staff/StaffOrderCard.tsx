@@ -75,22 +75,18 @@ const StaffOrderCard = ({
           <Pressable style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </Pressable>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => onUpdateStatus(order, 'IN_PROCESS')}
-          >
+          <Pressable style={styles.primaryButton} onPress={() => onUpdateStatus(order, 'IN_PROCESS')}>
             <Text style={styles.primaryButtonText}>Enviar a cocina</Text>
           </Pressable>
         </View>
       ) : null}
 
       {order.status === 'IN_PROCESS' ? (
-        <Pressable
-          style={[styles.primaryButton, styles.servedButton]}
-          onPress={() => onUpdateStatus(order, 'DELIVERED')}
-        >
-          <Text style={styles.primaryButtonText}>Marcar entregado</Text>
-        </Pressable>
+        <View style={styles.actionsRow}>
+          <Pressable style={[styles.primaryButton, styles.servedButton]} onPress={() => onUpdateStatus(order, 'DELIVERED')}>
+            <Text style={styles.primaryButtonText}>Marcar entregado</Text>
+          </Pressable>
+        </View>
       ) : null}
     </Pressable>
   );
@@ -183,6 +179,7 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     gap: SPACING.small,
+    marginTop: SPACING.small,
   },
   cancelButton: {
     flex: 1,

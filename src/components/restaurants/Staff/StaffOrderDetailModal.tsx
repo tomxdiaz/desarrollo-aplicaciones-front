@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     gap: SPACING.small,
+    marginTop: SPACING.small,
   },
   cancelButton: {
     flex: 1,

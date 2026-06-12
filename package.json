@@ -7,6 +7,7 @@
     "dev:android": "npx expo start -c --android",
     "dev:ios": "npx expo start -c --ios",
     "dev:web": "npx expo start -c --web",
+    "android": "expo start --android",
     "build:dev:android": "eas build -p android --profile preview",
     "build:prod:android": "eas build -p android --profile production"
   },

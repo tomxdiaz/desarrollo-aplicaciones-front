@@ -31,6 +31,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [tableInput, setTableInput] = useState('');
   const [tableInputFocused, setTableInputFocused] = useState(false);
+  const [tableError, setTableError] = useState<string | null>(null);
 
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -38,17 +39,52 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const { setRestaurantName } = useHeaderRestaurant();
 
+  const TABLE_CODE_REGEX = /^[A-Za-z0-9 _\-]+$/;
+
   const goToMenu = (rawCode: string) => {
     const parsed = parseTableCode(rawCode);
 
     if (!parsed) {
-      Alert.alert('Invalid code', 'The table code in invalid. Format: restaurantId/tableCode (e.g: 1/1A)');
+      Alert.alert('Código inválido', 'El formato del QR no es válido.');
+      return;
+    }
+
+    const tableExists = restaurant?.tables?.some(
+      (t) => t.code.toUpperCase() === parsed.tableCode.toUpperCase(),
+    );
+
+    if (!tableExists) {
+      Alert.alert('Mesa no encontrada', 'Esa mesa no existe en este restaurante.');
       return;
     }
 
     router.push({
       pathname: '/restaurants/[id]/menu',
       params: { id: parsed.restaurantId, table: parsed.tableCode },
+    });
+  };
+
+  const handleGoToMenuManual = () => {
+    const code = tableInput.trim();
+
+    if (!TABLE_CODE_REGEX.test(code)) {
+      setTableError('Código inválido. Usá solo letras y números (ej: 1A, TERRAZA).');
+      return;
+    }
+
+    const tableExists = restaurant?.tables?.some(
+      (t) => t.code.toUpperCase() === code.toUpperCase(),
+    );
+
+    if (!tableExists) {
+      setTableError('Esa mesa no existe en este restaurante.');
+      return;
+    }
+
+    setTableError(null);
+    router.push({
+      pathname: '/restaurants/[id]/menu',
+      params: { id, table: code },
     });
   };
 
@@ -162,26 +198,23 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
             <Text style={styles.tableHint}>Ingresá el código que figura en tu mesa (ej: 1A, TERRAZA)</Text>
 
             <TextInput
-              style={styles.tableInput}
+              style={[styles.tableInput, tableError ? styles.tableInputError : null]}
               placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (1A, 2B...)'}
               placeholderTextColor={COLORS.common.gris_medio}
               value={tableInput}
-              onChangeText={setTableInput}
+              onChangeText={(text) => { setTableInput(text); setTableError(null); }}
               onFocus={() => setTableInputFocused(true)}
               onBlur={() => setTableInputFocused(false)}
               autoCapitalize='characters'
               keyboardType='email-address'
             />
 
+            {tableError ? (
+              <Text style={styles.tableErrorText}>{tableError}</Text>
+            ) : null}
+
             {tableInput.trim().length > 0 ? (
-              <Pressable
-                style={styles.menuButton}
-                onPress={() => {
-                  router.push({
-                    pathname: '/restaurants/[id]/menu',
-                    params: { id, table: tableInput.trim() },
-                  });
-                }}>
+              <Pressable style={styles.menuButton} onPress={handleGoToMenuManual}>
                 <Text style={styles.menuButtonText}>Ir al menú</Text>
               </Pressable>
             ) : null}
@@ -318,6 +351,15 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     color: COLORS.common.negro_principal,
     textAlign: 'center',
+  },
+  tableInputError: {
+    borderColor: COLORS.status.error,
+  },
+  tableErrorText: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.status.error,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   menuButton: {
     alignItems: 'center',

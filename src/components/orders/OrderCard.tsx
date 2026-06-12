@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: SPACING.small,
+    marginTop: SPACING.small,
   },
   actionsGroup: {
     display: 'flex',

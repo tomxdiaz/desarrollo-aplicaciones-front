@@ -282,11 +282,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   actionsRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: SPACING.small,
   },
   secondaryAction: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -303,7 +302,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
   },
   primaryAction: {
-    flex: 1.35,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
