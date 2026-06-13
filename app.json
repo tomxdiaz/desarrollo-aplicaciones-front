@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "desarrollo-aplicaciones-front",
+    "name": "Provecho!",
     "slug": "desarrollo-aplicaciones-front",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,11 +22,17 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": false,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.tomxdiaz.desarrolloaplicacionesfront"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": ["expo-font"],
+    "extra": {
+      "eas": {
+        "projectId": "82031e3f-6530-4c1f-bf47-25cdea527da9"
+      }
+    }
   }
 }

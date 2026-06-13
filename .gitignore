@@ -43,3 +43,6 @@ yarn-error.*
 
 # Local git worktrees
 .worktrees/
+
+# EAS build
+eas.json
