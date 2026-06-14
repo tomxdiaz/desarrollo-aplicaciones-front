@@ -1,5 +1,5 @@
 import { apiClient } from '../lib/apiClient';
-import { CreateRestaurantPayload, Restaurant } from '../types/types';
+import { CreateRestaurantPayload, Restaurant, UpdateRestaurantPayload } from '../types/types';
 
 export const restaurantService = {
   getAllRestaurants: async () => {
@@ -23,6 +23,14 @@ export const restaurantService = {
   createRestaurant: async (payload: CreateRestaurantPayload) => {
     return apiClient<Restaurant>('/restaurant', {
       method: 'POST',
+      body: payload,
+      requireAuth: true,
+    });
+  },
+
+  updateRestaurant: async (id: string, payload: UpdateRestaurantPayload) => {
+    return apiClient<Restaurant>(`/restaurant/${id}`, {
+      method: 'PATCH',
       body: payload,
       requireAuth: true,
     });

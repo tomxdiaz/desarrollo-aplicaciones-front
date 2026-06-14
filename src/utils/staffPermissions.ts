@@ -16,6 +16,9 @@ export const canUpdateOrderStatus = (_role: RestaurantStaffEnum) => true;
 export const canManageStaff = (role: RestaurantStaffEnum) =>
   role === RestaurantStaffEnum.OWNER || role === RestaurantStaffEnum.ADMIN;
 
+export const canEditRestaurant = (role: RestaurantStaffEnum) =>
+  role === RestaurantStaffEnum.OWNER || role === RestaurantStaffEnum.ADMIN;
+
 // Mirrors the server-side getStaffRoleRank. Backend remains the source of truth.
 export const getStaffRoleRank = (role: RestaurantStaffEnum): number => {
   if (role === RestaurantStaffEnum.OWNER) return 4;

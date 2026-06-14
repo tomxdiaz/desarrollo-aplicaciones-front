@@ -30,11 +30,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadAppUser = async (session: Session | null) => {
     if (!session) {
+      console.log('[AuthProvider] loadAppUser: session is null → setAppUser(null)');
       setAppUser(null);
       return;
     }
 
+    console.log('[AuthProvider] loadAppUser: calling /app_user/me...');
     const appUser = await appUserService.getMyAppUser();
+    console.log('[AuthProvider] loadAppUser: success →', appUser.email, appUser.global_role);
     setAppUser(appUser);
   };
 
@@ -63,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initAuth = async () => {
       setLoading(true);
+      console.log('[AuthProvider] initAuth: started');
 
       const {
         data: { session },
@@ -70,15 +74,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!mounted) return;
 
+      console.log('[AuthProvider] initAuth: getSession() →', session ? `session exists (user: ${session.user.email})` : 'null');
       setSession(session);
 
       try {
         await loadAppUser(session);
       } catch (error) {
-        console.error('Error loading app user:', error);
+        console.error('[AuthProvider] initAuth: loadAppUser FAILED →', error);
         setAppUser(null);
       } finally {
         if (mounted) {
+          console.log('[AuthProvider] initAuth: done → setLoading(false)');
           setLoading(false);
         }
       }
@@ -88,16 +94,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AuthProvider] onAuthStateChange: event =', event, '| session =', session ? session.user.email : 'null');
+
+      if (event === 'TOKEN_REFRESHED') {
+        setSession(session);
+        return;
+      }
+
       setLoading(true);
       setSession(session);
 
       try {
         await loadAppUser(session);
       } catch (error) {
-        console.error('Error loading app user:', error);
+        console.error('[AuthProvider] onAuthStateChange: loadAppUser FAILED →', error);
         setAppUser(null);
       } finally {
+        console.log('[AuthProvider] onAuthStateChange: done → setLoading(false)');
         setLoading(false);
       }
     });

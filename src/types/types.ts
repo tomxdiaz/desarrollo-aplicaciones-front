@@ -79,6 +79,12 @@ export type CreateRestaurantPayload = {
   address?: string;
 };
 
+export type UpdateRestaurantPayload = {
+  name: string;
+  description: string | null;
+  address: string | null;
+};
+
 export type CreateTablePayload = {
   code: string;
   area?: string;
@@ -98,7 +104,7 @@ export type CreateProductPayload = {
   category_id: number;
   name: string;
   description?: string;
-  price: number;
+  price: number; 
   image?: string;
 };
 

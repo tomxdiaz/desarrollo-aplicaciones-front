@@ -6,7 +6,7 @@ import { useAuth } from '../../../providers/auth.provider';
 import { AppRoleEnum, Restaurant, RestaurantStaff, RestaurantStaffEnum } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
-import { canManageMenu, canManageStaff } from '../../../utils/staffPermissions';
+import { canEditRestaurant, canManageMenu, canManageStaff } from '../../../utils/staffPermissions';
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
@@ -15,6 +15,7 @@ import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
 import RestaurantStaffScreen from '../Staff/RestaurantStaffScreen';
 import RestaurantMenuManagementScreen from '../Staff/RestaurantMenuManagementScreen';
+import RestaurantEditScreen from '../Staff/RestaurantEditScreen';
 
 const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   const { appUser } = useAuth();
@@ -119,6 +120,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   }
 
   const visibleTabs: StaffTab[] = STAFF_TABS.filter((tab) => {
+    if (tab.key === 'edit') return canEditRestaurant(effectiveStaffRole);
     if (tab.key === 'menu') return canManageMenu(effectiveStaffRole);
     if (tab.key === 'staff') return canManageStaff(effectiveStaffRole);
     return true;
@@ -126,6 +128,15 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   
   const renderActiveTab = () => {
     switch (activeTab) {
+      case 'edit':
+        return (
+          <RestaurantEditScreen
+            restaurantId={id}
+            restaurant={myRestaurant}
+            onRefresh={refreshRestaurant}
+          />
+        );
+
       case 'orders':
         return (
           <RestaurantOrdersScreen

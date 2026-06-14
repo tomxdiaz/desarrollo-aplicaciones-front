@@ -3,9 +3,17 @@ import { AppRoleEnum, AppUser } from '../types/types';
 
 export const appUserService = {
   getMyAppUser: async () => {
-    return apiClient<AppUser>('/app_user/me', {
-      requireAuth: true,
-    });
+    console.log('[appUserService] getMyAppUser: calling /app_user/me...');
+    try {
+      const result = await apiClient<AppUser>('/app_user/me', {
+        requireAuth: true,
+      });
+      console.log('[appUserService] getMyAppUser: success →', result.email);
+      return result;
+    } catch (error) {
+      console.error('[appUserService] getMyAppUser: FAILED →', error);
+      throw error;
+    }
   },
 
   getAllUsers: async () => {
