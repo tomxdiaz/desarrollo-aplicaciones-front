@@ -104,7 +104,7 @@ export type CreateProductPayload = {
   category_id: number;
   name: string;
   description?: string;
-  price: number; 
+  price: number;
   image?: string;
 };
 
@@ -115,5 +115,5 @@ export type RestaurantStaff = {
   user_id: string;
   restaurant_id: number;
   role: RestaurantStaffEnum;
+  app_user: AppUser;
 };
-

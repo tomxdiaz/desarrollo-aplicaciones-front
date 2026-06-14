@@ -228,7 +228,7 @@ import { AuthProvider } from '../src/providers/auth.provider';
 import { CartProvider } from '../src/providers/cart.provider';
 
 SplashScreen.setOptions({
-  duration: 3000,
+  duration: 1200,
   fade: true,
 });
 

@@ -3,16 +3,14 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Category, CreateProductPayload, Product } from '../../../types/types';
 import { COLORS } from '../../../constants/colors';
@@ -102,18 +100,17 @@ const MenuProductFormModal = ({
   return (
     <Modal visible={visible} transparent animationType='slide' onRequestClose={handleClose}>
       <Pressable style={styles.overlay} onPress={handleClose}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardView}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.handle} />
+        <Pressable style={styles.sheet} onPress={() => {}}>
+          <View style={styles.handle} />
 
-            <View style={styles.header}>
-              <Text style={styles.title}>{isEditing ? 'Editar producto' : 'Nuevo producto'}</Text>
-              <Pressable style={styles.closeButton} onPress={handleClose} disabled={submitting}>
-                <Ionicons name='close' size={ICON_SIZES.small} color={COLORS.common.gris_oscuro} />
-              </Pressable>
-            </View>
+          <View style={styles.header}>
+            <Text style={styles.title}>{isEditing ? 'Editar producto' : 'Nuevo producto'}</Text>
+            <Pressable style={styles.closeButton} onPress={handleClose} disabled={submitting}>
+              <Ionicons name='close' size={ICON_SIZES.small} color={COLORS.common.gris_oscuro} />
+            </Pressable>
+          </View>
 
-            <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
+          <KeyboardAwareScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps='handled' enableOnAndroid extraScrollHeight={80} showsVerticalScrollIndicator={false}>
               <View style={styles.field}>
                 <Text style={styles.label}>Imagen (URL)</Text>
                 <TextInput
@@ -204,9 +201,8 @@ const MenuProductFormModal = ({
                   <Text style={styles.submitButtonText}>{isEditing ? 'Guardar cambios' : 'Agregar producto'}</Text>
                 )}
               </Pressable>
-            </ScrollView>
-          </Pressable>
-        </KeyboardAvoidingView>
+          </KeyboardAwareScrollView>
+        </Pressable>
       </Pressable>
     </Modal>
   );
@@ -216,9 +212,6 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
-  },
-  keyboardView: {
     justifyContent: 'flex-end',
   },
   sheet: {

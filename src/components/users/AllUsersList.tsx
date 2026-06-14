@@ -6,6 +6,7 @@ import { SPACING, BORDER_RADIUS } from '../../constants/spacing_and_borders';
 import { useState } from 'react';
 import UserCard from './UserCard';
 import { useAuth } from '../../providers/auth.provider';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type AllUsersListProps = {
   users: AppUser[];
@@ -20,10 +21,16 @@ const AllUsersList = ({ users, onUserUpdated }: AllUsersListProps) => {
   const filteredUsers = otherUsers.filter((user) => user.email.toLowerCase().includes(searchText.toLowerCase()));
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps='handled'
+      enableOnAndroid
+      extraScrollHeight={80}
+      showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Usuarios</Text>
 
-      <TextInput style={styles.input} placeholder='Buscar usuarios...' value={searchText} onChangeText={setSearchText} />
+      <TextInput style={styles.input} placeholder='Buscar usuarios...' placeholderTextColor='#888888' value={searchText} onChangeText={setSearchText} />
 
       <View style={styles.list}>
         {filteredUsers.length > 0 ? (
@@ -32,15 +39,17 @@ const AllUsersList = ({ users, onUserUpdated }: AllUsersListProps) => {
           <Text style={styles.unavailableText}>{'No se obtuvieron resultados :('}</Text>
         )}
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
+    flex: 1,
     width: '100%',
-    height: '100%',
-    display: 'flex',
+  },
+  container: {
+    flexGrow: 1,
     flexDirection: 'column',
     padding: SPACING.large,
     gap: SPACING.large,

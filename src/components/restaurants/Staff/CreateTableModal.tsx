@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
@@ -66,7 +67,13 @@ const CreateTableModal = ({
   return (
     <Modal visible={visible} transparent animationType='fade' onRequestClose={handleClose}>
       <View style={styles.overlay}>
-        <View style={styles.sheet}>
+        <KeyboardAwareScrollView
+          style={styles.sheetWrapper}
+          contentContainerStyle={styles.sheet}
+          keyboardShouldPersistTaps='handled'
+          enableOnAndroid
+          extraScrollHeight={80}
+          showsVerticalScrollIndicator={false}>
           <Text style={styles.title}>Nueva mesa</Text>
 
           <TextInput
@@ -101,7 +108,7 @@ const CreateTableModal = ({
               {submitting ? <ActivityIndicator color={COLORS.common.blanco} /> : <Text style={styles.createButtonText}>Crear mesa</Text>}
             </Pressable>
           </View>
-        </View>
+        </KeyboardAwareScrollView>
       </View>
     </Modal>
   );
@@ -115,10 +122,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: SPACING.large,
   },
-  sheet: {
+  sheetWrapper: {
     width: '100%',
     backgroundColor: COLORS.common.blanco,
     borderRadius: BORDER_RADIUS.medium,
+    overflow: 'hidden',
+  },
+  sheet: {
     padding: SPACING.large,
     gap: SPACING.medium,
   },

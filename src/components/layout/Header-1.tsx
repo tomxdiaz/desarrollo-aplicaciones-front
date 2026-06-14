@@ -10,11 +10,6 @@ import { ICON_SIZES } from '../../constants/icon_sizes';
 import { router } from 'expo-router';
 import { useHeaderRestaurant } from '../../providers/header-restaurant.provider';
 
-SplashScreen.setOptions({
-  duration: 3000,
-  fade: true,
-});
-
 export default function Header1() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { restaurantName } = useHeaderRestaurant();

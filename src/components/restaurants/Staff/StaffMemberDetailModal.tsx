@@ -69,14 +69,9 @@ const StaffMemberDetailModal = ({
               <View style={styles.header}>
                 <View style={styles.headerTexts}>
                   <Text style={styles.title}>Integrante del equipo</Text>
-                  <Text style={styles.subtitle}>{member.user_id.slice(0, 8)}...</Text>
+                  <Text style={styles.subtitle}>{member.app_user.email}</Text>
                 </View>
-                <Pressable
-                  style={styles.closeButton}
-                  onPress={handleClose}
-                  accessibilityRole='button'
-                  accessibilityLabel='Cerrar'
-                >
+                <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole='button' accessibilityLabel='Cerrar'>
                   <Ionicons name='close' size={ICON_SIZES.small} color={COLORS.common.gris_oscuro} />
                 </Pressable>
               </View>
@@ -84,9 +79,7 @@ const StaffMemberDetailModal = ({
               <View style={styles.badgeRow}>
                 <View style={[styles.badge, { backgroundColor: `${roleColor}1A` }]}>
                   <View style={[styles.dot, { backgroundColor: roleColor }]} />
-                  <Text style={[styles.badgeText, { color: roleColor }]}>
-                    {RESTAURANT_STAFF_ROLE_LABELS[member.role]}
-                  </Text>
+                  <Text style={[styles.badgeText, { color: roleColor }]}>{RESTAURANT_STAFF_ROLE_LABELS[member.role]}</Text>
                 </View>
                 {isSelf ? <Text style={styles.selfLabel}>(Vos)</Text> : null}
               </View>
@@ -102,11 +95,8 @@ const StaffMemberDetailModal = ({
                           <Pressable
                             key={role}
                             style={[styles.rolePill, isActive ? styles.rolePillActive : styles.rolePillInactive]}
-                            onPress={() => setPendingRole(role)}
-                          >
-                            <Text
-                              style={[styles.rolePillText, isActive ? styles.rolePillTextActive : styles.rolePillTextInactive]}
-                            >
+                            onPress={() => setPendingRole(role)}>
+                            <Text style={[styles.rolePillText, isActive ? styles.rolePillTextActive : styles.rolePillTextInactive]}>
                               {RESTAURANT_STAFF_ROLE_LABELS[role]}
                             </Text>
                           </Pressable>

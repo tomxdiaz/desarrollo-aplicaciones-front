@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Restaurant } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { COLORS } from '../../../constants/colors';
@@ -65,15 +63,14 @@ const RestaurantEditScreen = ({
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps='handled'
+      enableOnAndroid
+      extraScrollHeight={80}
+      showsVerticalScrollIndicator={false}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps='handled'
-        showsVerticalScrollIndicator={false}
-      >
         <View style={styles.field}>
           <Text style={styles.label}>Nombre</Text>
           <TextInput
@@ -126,8 +123,7 @@ const RestaurantEditScreen = ({
             <Text style={styles.saveButtonText}>Guardar cambios</Text>
           )}
         </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 

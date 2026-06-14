@@ -5,15 +5,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { RestaurantStaff } from '../../../types/types';
 import { RESTAURANT_STAFF_ROLE_LABELS, getRestaurantStaffRoleStyle } from '../../../types/restaurant-staff-role';
 
-const StaffMemberCard = ({
-  member,
-  isCurrentUser,
-  onPress,
-}: {
-  member: RestaurantStaff;
-  isCurrentUser: boolean;
-  onPress: () => void;
-}) => {
+const StaffMemberCard = ({ member, isCurrentUser, onPress }: { member: RestaurantStaff; isCurrentUser: boolean; onPress: () => void }) => {
   const { color } = getRestaurantStaffRoleStyle(member.role);
   const label = RESTAURANT_STAFF_ROLE_LABELS[member.role];
 
@@ -26,7 +18,7 @@ const StaffMemberCard = ({
         </View>
         {isCurrentUser ? <Text style={styles.selfLabel}>(Vos)</Text> : null}
       </View>
-      <Text style={styles.userId}>{member.user_id.slice(0, 8)}...</Text>
+      <Text style={styles.userId}>{member.app_user.email}</Text>
     </Pressable>
   );
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/colors';
@@ -169,7 +170,13 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={styles.screen}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps='handled'
+        enableOnAndroid
+        extraScrollHeight={80}
+        showsVerticalScrollIndicator={false}>
         <Image style={styles.heroImage} source={require('../../../../assets/images/restaurant.jpg')} resizeMode='cover' />
 
         <View style={styles.content}>
@@ -238,7 +245,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

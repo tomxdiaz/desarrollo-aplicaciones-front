@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
@@ -68,8 +66,13 @@ const MenuCategoryModal = ({
   return (
     <Modal visible={visible} transparent animationType='fade' onRequestClose={handleClose}>
       <Pressable style={styles.overlay} onPress={handleClose}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardView}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
+        <Pressable style={styles.sheetWrapper} onPress={() => {}}>
+          <KeyboardAwareScrollView
+            contentContainerStyle={styles.sheet}
+            keyboardShouldPersistTaps='handled'
+            enableOnAndroid
+            extraScrollHeight={80}
+            showsVerticalScrollIndicator={false}>
             <View style={styles.iconWrap}>
               <Ionicons name='folder-outline' size={ICON_SIZES.large} color={COLORS.primary.terracota} />
             </View>
@@ -89,13 +92,13 @@ const MenuCategoryModal = ({
             {existingNames.length > 0 ? (
               <View style={styles.tagsBlock}>
                 <Text style={styles.tagsTitle}>Categorías actuales</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagsRow}>
+                <KeyboardAwareScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagsRow}>
                   {existingNames.map((item) => (
                     <View key={item} style={styles.tag}>
                       <Text style={styles.tagText}>{item}</Text>
                     </View>
                   ))}
-                </ScrollView>
+                </KeyboardAwareScrollView>
               </View>
             ) : null}
 
@@ -107,8 +110,8 @@ const MenuCategoryModal = ({
                 {submitting ? <ActivityIndicator color={COLORS.common.blanco} /> : <Text style={styles.createButtonText}>Crear</Text>}
               </Pressable>
             </View>
-          </Pressable>
-        </KeyboardAvoidingView>
+          </KeyboardAwareScrollView>
+        </Pressable>
       </Pressable>
     </Modal>
   );
@@ -122,12 +125,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: SPACING.large,
   },
-  keyboardView: {
+  sheetWrapper: {
     width: '100%',
-  },
-  sheet: {
     backgroundColor: COLORS.common.blanco,
     borderRadius: BORDER_RADIUS.large,
+    overflow: 'hidden',
+  },
+  sheet: {
     padding: SPACING.large,
     gap: SPACING.medium,
   },
