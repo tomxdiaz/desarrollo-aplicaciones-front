@@ -46,3 +46,9 @@ yarn-error.*
 
 # EAS build
 eas.json
+
+# Test coverage
+coverage/
+
+# Claude Code
+.claude/
