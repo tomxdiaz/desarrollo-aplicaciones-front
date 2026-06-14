@@ -122,12 +122,17 @@ axiosInstance.interceptors.response.use(
 export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
   const { method = 'GET', body, headers = {}, requireAuth = true } = options;
 
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+
   const config: AxiosRequestConfig = {
     url: endpoint,
     method,
     data: body,
     headers: {
       ...headers,
+      // For multipart uploads let the native layer set the Content-Type so the
+      // proper boundary is included; overrides the JSON instance default.
+      ...(isFormData ? { 'Content-Type': 'multipart/form-data' } : {}),
       requireAuth: String(requireAuth),
     },
   };

@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Category, CreateProductPayload, Product } from '../../../types/types';
+import { Category, CreateProductPayload, ImageFile, Product } from '../../../types/types';
+import { pickImage } from '../../../utils/image';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
@@ -31,7 +32,8 @@ const MenuProductFormModal = ({
   onClose: () => void;
   onSubmit: (payload: CreateProductPayload) => Promise<void>;
 }) => {
-  const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState<ImageFile | null>(null);
+  const [existingImage, setExistingImage] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -44,19 +46,26 @@ const MenuProductFormModal = ({
       return;
     }
 
-    setImage(product?.image ?? '');
+    setImageFile(null);
+    setExistingImage(product?.image ?? null);
     setName(product?.name ?? '');
     setDescription(product?.description ?? '');
     setPrice(product ? String(product.price) : '');
     setCategoryId(product?.category_id ?? categories[0]?.id ?? null);
   }, [categories, product, visible]);
 
-  const previewUrl = useMemo(() => image.trim(), [image]);
+  const previewUrl = useMemo(() => imageFile?.uri ?? existingImage ?? '', [imageFile, existingImage]);
   const isEditing = Boolean(product);
 
   const handleClose = () => {
     if (submitting) return;
     onClose();
+  };
+
+  const handlePickImage = async () => {
+    if (submitting) return;
+    const picked = await pickImage();
+    if (picked) setImageFile(picked);
   };
 
   const handleSubmit = async () => {
@@ -86,7 +95,7 @@ const MenuProductFormModal = ({
         name: trimmedName,
         description: description.trim() || undefined,
         price: parsedPrice,
-        image: previewUrl || undefined,
+        imageFile: imageFile ?? undefined,
       });
       onClose();
     } catch (error) {
@@ -112,27 +121,21 @@ const MenuProductFormModal = ({
 
           <KeyboardAwareScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps='handled' enableOnAndroid extraScrollHeight={80} showsVerticalScrollIndicator={false}>
               <View style={styles.field}>
-                <Text style={styles.label}>Imagen (URL)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder='https://example.com/producto.jpg'
-                  placeholderTextColor={COLORS.common.gris_medio}
-                  value={image}
-                  onChangeText={setImage}
-                  editable={!submitting}
-                  autoCapitalize='none'
-                />
-              </View>
-
-              <View style={styles.previewBox}>
-                {previewUrl ? (
-                  <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode='cover' />
-                ) : (
-                  <>
-                    <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
-                    <Text style={styles.previewText}>Vista previa</Text>
-                  </>
-                )}
+                <Text style={styles.label}>Imagen</Text>
+                <Pressable style={styles.previewBox} onPress={handlePickImage} disabled={submitting}>
+                  {previewUrl ? (
+                    <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode='cover' />
+                  ) : (
+                    <>
+                      <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
+                      <Text style={styles.previewText}>Vista previa</Text>
+                    </>
+                  )}
+                </Pressable>
+                <Pressable style={styles.imageButton} onPress={handlePickImage} disabled={submitting}>
+                  <Ionicons name='image-outline' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
+                  <Text style={styles.imageButtonText}>{previewUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}</Text>
+                </Pressable>
               </View>
 
               <View style={styles.field}>
@@ -295,6 +298,22 @@ const styles = StyleSheet.create({
   },
   previewText: {
     color: COLORS.common.gris_medio,
+    fontSize: FONT_SIZES.text_base,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.small,
+    paddingVertical: SPACING.medium,
+    borderRadius: BORDER_RADIUS.medium,
+    borderWidth: 1,
+    borderColor: COLORS.primary.terracota,
+    backgroundColor: COLORS.surface.fondo_crema,
+  },
+  imageButtonText: {
+    color: COLORS.primary.terracota,
+    fontWeight: '700',
     fontSize: FONT_SIZES.text_base,
   },
   categoryGrid: {

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Menu, Product, RestaurantStaffEnum } from '../../../types/types';
+import { CreateProductPayload, Menu, Product, RestaurantStaffEnum } from '../../../types/types';
 import { menuService } from '../../../services/menu.service';
 import { canManageMenu } from '../../../utils/staffPermissions';
 import { formatPrice, getActiveCategories } from '../../../utils/menu';
@@ -65,12 +65,12 @@ const RestaurantMenuManagementScreen = ({
     await onRefresh();
   };
 
-  const handleCreateProduct = async (payload: { category_id: number; name: string; description?: string; price: number; image?: string }) => {
+  const handleCreateProduct = async (payload: CreateProductPayload) => {
     await menuService.createProduct(restaurantId, payload);
     await onRefresh();
   };
 
-  const handleUpdateProduct = async (payload: { category_id: number; name: string; description?: string; price: number; image?: string }) => {
+  const handleUpdateProduct = async (payload: CreateProductPayload) => {
     if (!editingProduct) return;
     await menuService.updateProduct(restaurantId, String(editingProduct.id), payload);
     await onRefresh();

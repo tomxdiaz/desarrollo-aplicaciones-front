@@ -177,7 +177,13 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
         enableOnAndroid
         extraScrollHeight={80}
         showsVerticalScrollIndicator={false}>
-        <Image style={styles.heroImage} source={require('../../../../assets/images/restaurant.jpg')} resizeMode='cover' />
+        {restaurant.image ? (
+          <Image style={styles.heroImage} source={{ uri: restaurant.image }} resizeMode='cover' />
+        ) : (
+          <View style={[styles.heroImage, styles.heroPlaceholder]}>
+            <Ionicons name='restaurant' size={ICON_SIZES.extra_large} color={COLORS.common.blanco} />
+          </View>
+        )}
 
         <View style={styles.content}>
           <Text style={styles.restaurantName}>{restaurant.name}</Text>
@@ -284,6 +290,11 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: 220,
+  },
+  heroPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary.arena_calida,
   },
   content: {
     paddingHorizontal: SPACING.large,

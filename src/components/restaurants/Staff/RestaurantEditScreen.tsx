@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -9,11 +10,14 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Restaurant } from '../../../types/types';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { ImageFile, Restaurant } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
+import { pickImage } from '../../../utils/image';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { ICON_SIZES } from '../../../constants/icon_sizes';
 
 const RestaurantEditScreen = ({
   restaurantId,
@@ -27,6 +31,8 @@ const RestaurantEditScreen = ({
   const [name, setName] = useState(restaurant.name);
   const [description, setDescription] = useState(restaurant.description ?? '');
   const [address, setAddress] = useState(restaurant.address ?? '');
+  const [imageFile, setImageFile] = useState<ImageFile | null>(null);
+  const [existingImage, setExistingImage] = useState<string | null>(restaurant.image ?? null);
   const [submitting, setSubmitting] = useState(false);
 
   // Sync form when parent refreshes restaurant data after a successful save.
@@ -34,7 +40,17 @@ const RestaurantEditScreen = ({
     setName(restaurant.name);
     setDescription(restaurant.description ?? '');
     setAddress(restaurant.address ?? '');
+    setImageFile(null);
+    setExistingImage(restaurant.image ?? null);
   }, [restaurant]);
+
+  const previewUrl = useMemo(() => imageFile?.uri ?? existingImage ?? '', [imageFile, existingImage]);
+
+  const handlePickImage = async () => {
+    if (submitting) return;
+    const picked = await pickImage();
+    if (picked) setImageFile(picked);
+  };
 
   const handleSave = async () => {
     const trimmedName = name.trim();
@@ -51,6 +67,7 @@ const RestaurantEditScreen = ({
         name: trimmedName,
         description: description.trim() || null,
         address: address.trim() || null,
+        imageFile: imageFile ?? undefined,
       });
       await onRefresh();
       Alert.alert('Guardado', 'La información del restaurante fue actualizada.');
@@ -110,6 +127,24 @@ const RestaurantEditScreen = ({
           />
         </View>
 
+        <View style={styles.field}>
+          <Text style={styles.label}>Imagen</Text>
+          <Pressable style={styles.previewBox} onPress={handlePickImage} disabled={submitting}>
+            {previewUrl ? (
+              <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode='cover' />
+            ) : (
+              <>
+                <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
+                <Text style={styles.previewText}>Vista previa</Text>
+              </>
+            )}
+          </Pressable>
+          <Pressable style={styles.imageButton} onPress={handlePickImage} disabled={submitting}>
+            <Ionicons name='image-outline' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
+            <Text style={styles.imageButtonText}>{previewUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}</Text>
+          </Pressable>
+        </View>
+
         <Pressable
           style={[styles.saveButton, submitting && styles.saveButtonDisabled]}
           onPress={handleSave}
@@ -157,6 +192,41 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     paddingTop: SPACING.medium,
+  },
+  previewBox: {
+    minHeight: 140,
+    borderRadius: BORDER_RADIUS.medium,
+    backgroundColor: COLORS.common.blanco,
+    borderWidth: 1,
+    borderColor: COLORS.surface.borde_calido,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    gap: SPACING.small,
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+  },
+  previewText: {
+    color: COLORS.common.gris_medio,
+    fontSize: FONT_SIZES.text_base,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.small,
+    paddingVertical: SPACING.medium,
+    borderRadius: BORDER_RADIUS.medium,
+    borderWidth: 1,
+    borderColor: COLORS.primary.terracota,
+    backgroundColor: COLORS.common.blanco,
+  },
+  imageButtonText: {
+    color: COLORS.primary.terracota,
+    fontWeight: '700',
+    fontSize: FONT_SIZES.text_base,
   },
   saveButton: {
     alignItems: 'center',

@@ -69,20 +69,35 @@ export type Restaurant = {
   owner_id: string;
   description: string | null;
   address: string | null;
+  image: string | null;
   tables?: RestaurantTable[];
   menu?: Menu;
+};
+
+/**
+ * A local image selected from the device (e.g. via expo-image-picker) ready to
+ * be uploaded as a multipart file part.
+ */
+export type ImageFile = {
+  uri: string;
+  name: string;
+  type: string;
 };
 
 export type CreateRestaurantPayload = {
   name: string;
   description?: string;
   address?: string;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
 };
 
 export type UpdateRestaurantPayload = {
   name: string;
   description: string | null;
   address: string | null;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
 };
 
 export type CreateTablePayload = {
@@ -105,7 +120,8 @@ export type CreateProductPayload = {
   name: string;
   description?: string;
   price: number;
-  image?: string;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
 };
 
 export type UpdateProductPayload = Partial<CreateProductPayload>;

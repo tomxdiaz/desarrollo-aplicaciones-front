@@ -28,7 +28,15 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"],
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para subir imágenes de restaurantes y productos."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "82031e3f-6530-4c1f-bf47-25cdea527da9"

@@ -1,5 +1,26 @@
 import { apiClient } from '../lib/apiClient';
 import { CreateRestaurantPayload, Restaurant, UpdateRestaurantPayload } from '../types/types';
+import { appendImageToFormData } from '../utils/image';
+
+const buildRestaurantFormData = (
+  payload: CreateRestaurantPayload | UpdateRestaurantPayload,
+): FormData => {
+  const form = new FormData();
+
+  form.append('name', payload.name);
+
+  if (payload.description !== undefined && payload.description !== null) {
+    form.append('description', payload.description);
+  }
+
+  if (payload.address !== undefined && payload.address !== null) {
+    form.append('address', payload.address);
+  }
+
+  appendImageToFormData(form, payload.imageFile, payload.existingImage);
+
+  return form;
+};
 
 export const restaurantService = {
   getAllRestaurants: async () => {
@@ -23,7 +44,7 @@ export const restaurantService = {
   createRestaurant: async (payload: CreateRestaurantPayload) => {
     return apiClient<Restaurant>('/restaurant', {
       method: 'POST',
-      body: payload,
+      body: buildRestaurantFormData(payload),
       requireAuth: true,
     });
   },
@@ -31,7 +52,7 @@ export const restaurantService = {
   updateRestaurant: async (id: string, payload: UpdateRestaurantPayload) => {
     return apiClient<Restaurant>(`/restaurant/${id}`, {
       method: 'PATCH',
-      body: payload,
+      body: buildRestaurantFormData(payload),
       requireAuth: true,
     });
   },

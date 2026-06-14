@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -15,7 +16,8 @@ import { COLORS } from '../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { ICON_SIZES } from '../../constants/icon_sizes';
-import { CreateRestaurantPayload } from '../../types/types';
+import { CreateRestaurantPayload, ImageFile } from '../../types/types';
+import { pickImage } from '../../utils/image';
 
 const CreateRestaurantModal = ({
   visible,
@@ -29,18 +31,26 @@ const CreateRestaurantModal = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
+  const [imageFile, setImageFile] = useState<ImageFile | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
     setName('');
     setDescription('');
     setAddress('');
+    setImageFile(null);
   };
 
   const handleClose = () => {
     if (submitting) return;
     reset();
     onClose();
+  };
+
+  const handlePickImage = async () => {
+    if (submitting) return;
+    const picked = await pickImage();
+    if (picked) setImageFile(picked);
   };
 
   const handleSubmit = async () => {
@@ -58,6 +68,7 @@ const CreateRestaurantModal = ({
         name: trimmedName,
         description: description.trim() || undefined,
         address: address.trim() || undefined,
+        imageFile: imageFile ?? undefined,
       });
       reset();
       onClose();
@@ -125,6 +136,24 @@ const CreateRestaurantModal = ({
                   onChangeText={setAddress}
                   editable={!submitting}
                 />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Imagen</Text>
+                <Pressable style={styles.previewBox} onPress={handlePickImage} disabled={submitting}>
+                  {imageFile ? (
+                    <Image source={{ uri: imageFile.uri }} style={styles.previewImage} resizeMode='cover' />
+                  ) : (
+                    <>
+                      <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
+                      <Text style={styles.previewText}>Vista previa</Text>
+                    </>
+                  )}
+                </Pressable>
+                <Pressable style={styles.imageButton} onPress={handlePickImage} disabled={submitting}>
+                  <Ionicons name='image-outline' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
+                  <Text style={styles.imageButtonText}>{imageFile ? 'Cambiar imagen' : 'Seleccionar imagen'}</Text>
+                </Pressable>
               </View>
 
               <Pressable style={styles.createButton} onPress={handleSubmit} disabled={submitting}>
@@ -210,6 +239,41 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     paddingTop: SPACING.medium,
+  },
+  previewBox: {
+    minHeight: 140,
+    borderRadius: BORDER_RADIUS.medium,
+    backgroundColor: COLORS.common.blanco,
+    borderWidth: 1,
+    borderColor: COLORS.surface.borde_calido,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    gap: SPACING.small,
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+  },
+  previewText: {
+    color: COLORS.common.gris_medio,
+    fontSize: FONT_SIZES.text_base,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.small,
+    paddingVertical: SPACING.medium,
+    borderRadius: BORDER_RADIUS.medium,
+    borderWidth: 1,
+    borderColor: COLORS.primary.terracota,
+    backgroundColor: COLORS.common.blanco,
+  },
+  imageButtonText: {
+    color: COLORS.primary.terracota,
+    fontWeight: '700',
+    fontSize: FONT_SIZES.text_base,
   },
   createButton: {
     alignItems: 'center',

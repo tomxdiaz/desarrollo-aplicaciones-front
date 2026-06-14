@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
 import { useAuth } from '../../../providers/auth.provider';
@@ -10,6 +11,7 @@ import { canEditRestaurant, canManageMenu, canManageStaff } from '../../../utils
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { ICON_SIZES } from '../../../constants/icon_sizes';
 import StaffTabs, { StaffTab, StaffTabKey, STAFF_TABS } from '../Staff/StaffTabs';
 import RestaurantOrdersScreen from '../Staff/RestaurantOrdersScreen';
 import RestaurantTablesScreen from '../Staff/RestaurantTablesScreen';
@@ -170,11 +172,12 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
         );
   
       case 'staff': {
-        const staffInfo = myRestaurantStaffInfo ?? {
+        const staffInfo: RestaurantStaff = myRestaurantStaffInfo ?? {
           id: 0,
           user_id: appUser!.id,
           restaurant_id: myRestaurant.id,
           role: RestaurantStaffEnum.OWNER,
+          app_user: appUser!,
         };
         return (
           <RestaurantStaffScreen
@@ -188,6 +191,14 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   
   return (
     <View style={styles.screen}>
+      {myRestaurant.image ? (
+        <Image style={styles.heroImage} source={{ uri: myRestaurant.image }} resizeMode='cover' />
+      ) : (
+        <View style={[styles.heroImage, styles.heroPlaceholder]}>
+          <Ionicons name='restaurant' size={ICON_SIZES.extra_large} color={COLORS.common.blanco} />
+        </View>
+      )}
+
       <View style={styles.header}>
         <Text style={styles.restaurantName}>{myRestaurant.name}</Text>
       </View>
@@ -219,6 +230,15 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     color: COLORS.common.gris_oscuro,
     textAlign: 'center',
+  },
+  heroImage: {
+    width: '100%',
+    height: 180,
+  },
+  heroPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary.arena_calida,
   },
   header: {
     paddingHorizontal: SPACING.medium,
