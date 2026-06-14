@@ -17,6 +17,17 @@ export const COLORS = {
     gris_muy_claro: '#F5F5F5',
     blanco: '#FFFFFF',
   },
+  surface: {
+    fondo_crema: '#FAF6EF',
+    tarjeta_calida: '#F6EEE3',
+    borde_calido: '#EADFCF',
+    verde_suave: '#E7F3E6',
+    borde_verde: '#BFE0BD',
+    verde_texto: '#2E7D32',
+    rojo_suave: '#FBEAE8',
+    borde_rojo: '#F0C4BE',
+    rojo_texto: '#C62828',
+  },
   status: {
     exito: '#4CAF50',
     error: '#F44336',

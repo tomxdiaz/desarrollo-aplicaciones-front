@@ -5,7 +5,6 @@ import { supabaseService } from '../../services/supabase.service';
 export default function RegisterScreen() {
   const handleSignUp = async (email: string, password: string): Promise<void> => {
     await supabaseService.signUp(email, password);
-    router.navigate('/signin');
   };
 
   return (

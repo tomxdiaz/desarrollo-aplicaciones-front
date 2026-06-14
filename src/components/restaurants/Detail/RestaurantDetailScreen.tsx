@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/colors';
@@ -8,6 +9,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { restaurantService } from '../../../services/restaurant.service';
 import { Restaurant } from '../../../types/types';
+import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 function parseTableCode(code: string) {
@@ -28,25 +30,62 @@ function parseTableCode(code: string) {
 const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [tableCode, setTableCode] = useState('');
-  const [tableCodeFocused, setTableCodeFocused] = useState(false);
+  const [tableInput, setTableInput] = useState('');
+  const [tableInputFocused, setTableInputFocused] = useState(false);
+  const [tableError, setTableError] = useState<string | null>(null);
 
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
+  const { setRestaurantName } = useHeaderRestaurant();
+
+  const TABLE_CODE_REGEX = /^[A-Za-z0-9 _\-]+$/;
 
   const goToMenu = (rawCode: string) => {
     const parsed = parseTableCode(rawCode);
 
     if (!parsed) {
-      Alert.alert('Invalid code', 'The table code should look like restaurantId/tableCode');
+      Alert.alert('Código inválido', 'El formato del QR no es válido.');
+      return;
+    }
+
+    const tableExists = restaurant?.tables?.some(
+      (t) => t.code.toUpperCase() === parsed.tableCode.toUpperCase(),
+    );
+
+    if (!tableExists) {
+      Alert.alert('Mesa no encontrada', 'Esa mesa no existe en este restaurante.');
       return;
     }
 
     router.push({
-      pathname: '/(header-2)/restaurants/[id]/menu',
+      pathname: '/restaurants/[id]/menu',
       params: { id: parsed.restaurantId, table: parsed.tableCode },
+    });
+  };
+
+  const handleGoToMenuManual = () => {
+    const code = tableInput.trim();
+
+    if (!TABLE_CODE_REGEX.test(code)) {
+      setTableError('Código inválido. Usá solo letras y números (ej: 1A, TERRAZA).');
+      return;
+    }
+
+    const tableExists = restaurant?.tables?.some(
+      (t) => t.code.toUpperCase() === code.toUpperCase(),
+    );
+
+    if (!tableExists) {
+      setTableError('Esa mesa no existe en este restaurante.');
+      return;
+    }
+
+    setTableError(null);
+    router.push({
+      pathname: '/restaurants/[id]/menu',
+      params: { id, table: code },
     });
   };
 
@@ -79,6 +118,12 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
     fetchData();
   }, [id]);
+
+  // Publish the restaurant name to Header-1 while this screen is mounted.
+  useEffect(() => {
+    setRestaurantName(restaurant?.name ?? null);
+    return () => setRestaurantName(null);
+  }, [restaurant?.name, setRestaurantName]);
 
   if (scanning) {
     return (
@@ -125,8 +170,20 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={styles.screen}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Image style={styles.heroImage} source={require('../../../../assets/images/restaurant.jpg')} resizeMode='cover' />
+      <KeyboardAwareScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps='handled'
+        enableOnAndroid
+        extraScrollHeight={80}
+        showsVerticalScrollIndicator={false}>
+        {restaurant.image ? (
+          <Image style={styles.heroImage} source={{ uri: restaurant.image }} resizeMode='cover' />
+        ) : (
+          <View style={[styles.heroImage, styles.heroPlaceholder]}>
+            <Ionicons name='restaurant' size={ICON_SIZES.extra_large} color={COLORS.common.blanco} />
+          </View>
+        )}
 
         <View style={styles.content}>
           <Text style={styles.restaurantName}>{restaurant.name}</Text>
@@ -151,29 +208,26 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
           <View style={styles.tableSection}>
             <Text style={styles.tableTitle}>¿Estás en mesa?</Text>
-            <Text style={styles.tableHint}>Ingresá el código que figura en tu mesa (ej: A3, TERRAZA)</Text>
+            <Text style={styles.tableHint}>Ingresá el código que figura en tu mesa (ej: 1A, TERRAZA)</Text>
 
             <TextInput
-              style={styles.tableInput}
-              placeholder={tableCodeFocused ? undefined : 'CÓDIGO DE MESA (A1, B3...)'}
+              style={[styles.tableInput, tableError ? styles.tableInputError : null]}
+              placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (1A, 2B...)'}
               placeholderTextColor={COLORS.common.gris_medio}
-              value={tableCode}
-              onChangeText={setTableCode}
-              onFocus={() => setTableCodeFocused(true)}
-              onBlur={() => setTableCodeFocused(false)}
+              value={tableInput}
+              onChangeText={(text) => { setTableInput(text); setTableError(null); }}
+              onFocus={() => setTableInputFocused(true)}
+              onBlur={() => setTableInputFocused(false)}
               autoCapitalize='characters'
               keyboardType='email-address'
             />
 
-            {tableCode.trim().length > 0 ? (
-              <Pressable
-                style={styles.menuButton}
-                onPress={() =>
-                  router.push({
-                    pathname: '/(header-2)/restaurants/[id]/menu',
-                    params: { id, table: tableCode.trim() },
-                  })
-                }>
+            {tableError ? (
+              <Text style={styles.tableErrorText}>{tableError}</Text>
+            ) : null}
+
+            {tableInput.trim().length > 0 ? (
+              <Pressable style={styles.menuButton} onPress={handleGoToMenuManual}>
                 <Text style={styles.menuButtonText}>Ir al menú</Text>
               </Pressable>
             ) : null}
@@ -189,7 +243,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
               style={styles.outlineButton}
               onPress={() =>
                 router.push({
-                  pathname: '/(header-2)/restaurants/[id]/menu',
+                  pathname: '/restaurants/[id]/menu',
                   params: { id },
                 })
               }>
@@ -197,7 +251,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -236,6 +290,11 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: 220,
+  },
+  heroPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary.arena_calida,
   },
   content: {
     paddingHorizontal: SPACING.large,
@@ -310,6 +369,15 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     color: COLORS.common.negro_principal,
     textAlign: 'center',
+  },
+  tableInputError: {
+    borderColor: COLORS.status.error,
+  },
+  tableErrorText: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.status.error,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   menuButton: {
     alignItems: 'center',

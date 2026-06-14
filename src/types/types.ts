@@ -1,3 +1,10 @@
+export enum RestaurantStaffEnum {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  CASHIER_PLUS = 'CASHIER_PLUS',
+  CASHIER = 'CASHIER',
+}
+
 export enum AppRoleEnum {
   SUPER_USER = 'SUPER_USER',
   OWNER = 'OWNER',
@@ -62,45 +69,67 @@ export type Restaurant = {
   owner_id: string;
   description: string | null;
   address: string | null;
+  image: string | null;
   tables?: RestaurantTable[];
   menu?: Menu;
+};
+
+/**
+ * A local image selected from the device (e.g. via expo-image-picker) ready to
+ * be uploaded as a multipart file part.
+ */
+export type ImageFile = {
+  uri: string;
+  name: string;
+  type: string;
 };
 
 export type CreateRestaurantPayload = {
   name: string;
   description?: string;
   address?: string;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
 };
+
+export type UpdateRestaurantPayload = {
+  name: string;
+  description: string | null;
+  address: string | null;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
+};
+
+export type CreateTablePayload = {
+  code: string;
+  area?: string;
+  capacity: number;
+};
+
+export type CreateStaffPayload = {
+  email: string;
+  role: RestaurantStaffEnum;
+};
+
+export type CreateCategoryPayload = {
+  name: string;
+};
+
+export type CreateProductPayload = {
+  category_id: number;
+  name: string;
+  description?: string;
+  price: number;
+  imageFile?: ImageFile | null;
+  existingImage?: string | null;
+};
+
+export type UpdateProductPayload = Partial<CreateProductPayload>;
 
 export type RestaurantStaff = {
   id: number;
   user_id: string;
   restaurant_id: number;
-  role: AppRoleEnum;
-};
-
-export type OrderItem = {
-  id: number;
-  order_id: number;
-  product_id: number | null;
-  product_name: string;
-  product_description: string | null;
-  product_image: string | null;
-  unit_price: number;
-  quantity: number;
-  subtotal: number;
-};
-
-export type Order = {
-  id: number;
-  restaurant_id: number;
-  restaurant?: Restaurant;
-  table_id: number;
-  user_id: string | null;
-  number: number;
-  status: RestaurantOrderStatusEnum;
-  total: number;
-  created_at: string;
-  items?: OrderItem[];
-  note: string | null;
+  role: RestaurantStaffEnum;
+  app_user: AppUser;
 };

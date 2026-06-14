@@ -53,13 +53,14 @@ export default function AuthScreen({
         <TextInput
           style={styles.input}
           placeholder='example@email.com'
+          placeholderTextColor='#888888'
           value={email}
           onChangeText={setEmail}
           keyboardType='email-address'
           autoCapitalize='none'
         />
 
-        <TextInput style={styles.input} placeholder='**********' value={password} onChangeText={setPassword} secureTextEntry />
+        <TextInput style={styles.input} placeholder='**********' placeholderTextColor='#888888' value={password} onChangeText={setPassword} secureTextEntry />
 
         <TouchableOpacity style={styles.button} onPress={() => handleAuth(email, password)}>
           <Text style={styles.buttonText}>{buttonText}</Text>

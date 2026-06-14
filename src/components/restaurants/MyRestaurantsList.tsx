@@ -1,16 +1,32 @@
+import { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Restaurant, AppRoleEnum } from '../../types/types';
+import { CreateRestaurantPayload, Restaurant, AppRoleEnum } from '../../types/types';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import MyRestaurantCard from './MyRestaurantCard';
+import CreateRestaurantModal from './CreateRestaurantModal';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import { AntDesign } from '@expo/vector-icons';
 import { ICON_SIZES } from '../../constants/icon_sizes';
 import { useAuth } from '../../providers/auth.provider';
 import { isRole } from '../../utils/role';
+import { restaurantService } from '../../services/restaurant.service';
 
-const MyRestaurantsList = ({ restaurants }: { restaurants: Restaurant[] }) => {
+const MyRestaurantsList = ({
+  restaurants,
+  onRestaurantCreated,
+}: {
+  restaurants: Restaurant[];
+  onRestaurantCreated: (restaurant: Restaurant) => void;
+}) => {
   const { appUser } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const canCreateRestaurant = appUser && isRole(appUser, [AppRoleEnum.SUPER_USER, AppRoleEnum.OWNER]);
+
+  const handleCreate = async (payload: CreateRestaurantPayload) => {
+    const created = await restaurantService.createRestaurant(payload);
+    onRestaurantCreated(created);
+  };
 
   return (
     <View style={styles.container}>
@@ -24,11 +40,13 @@ const MyRestaurantsList = ({ restaurants }: { restaurants: Restaurant[] }) => {
         )}
       </View>
 
-      {appUser && isRole(appUser, [AppRoleEnum.SUPER_USER, AppRoleEnum.OWNER]) && (
-        <TouchableOpacity style={styles.addButton}>
+      {canCreateRestaurant ? (
+        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)} accessibilityRole='button' accessibilityLabel='Crear restaurante'>
           <AntDesign name='plus' size={ICON_SIZES.medium} color={COLORS.common.blanco} />
         </TouchableOpacity>
-      )}
+      ) : null}
+
+      <CreateRestaurantModal visible={modalVisible} onClose={() => setModalVisible(false)} onCreate={handleCreate} />
     </View>
   );
 };

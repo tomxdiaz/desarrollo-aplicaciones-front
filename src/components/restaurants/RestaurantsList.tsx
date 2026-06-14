@@ -5,16 +5,23 @@ import RestaurantCard from './RestaurantCard';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import { useState } from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const RestaurantsList = ({ restaurants }: { restaurants: Restaurant[] }) => {
   const [searchText, setSearchText] = useState('');
   const filteredRestaurants = restaurants.filter((restaurant) => restaurant.name.toLowerCase().includes(searchText.toLowerCase()));
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps='handled'
+      enableOnAndroid
+      extraScrollHeight={80}
+      showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Restaurantes</Text>
 
-      <TextInput style={styles.input} placeholder='Buscar restaurantes...' value={searchText} onChangeText={setSearchText} />
+      <TextInput style={styles.input} placeholder='Buscar restaurantes...' placeholderTextColor='#888888' value={searchText} onChangeText={setSearchText} />
 
       <View style={styles.list}>
         {filteredRestaurants && filteredRestaurants.length > 0 ? (
@@ -23,15 +30,17 @@ const RestaurantsList = ({ restaurants }: { restaurants: Restaurant[] }) => {
           <Text style={styles.unavailableText}>{'No hay restaurantes disponibles :('}</Text>
         )}
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
+    flex: 1,
     width: '100%',
-    height: '100%',
-    display: 'flex',
+  },
+  container: {
+    flexGrow: 1,
     flexDirection: 'column',
     padding: SPACING.large,
     gap: SPACING.large,
