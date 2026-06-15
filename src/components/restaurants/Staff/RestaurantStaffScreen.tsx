@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
@@ -9,6 +9,8 @@ import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
+import ScreenLoader from '../../shared/ScreenLoader';
+import ScreenError from '../../shared/ScreenError';
 import StaffMemberCard from './StaffMemberCard';
 import AddStaffModal from './AddStaffModal';
 import StaffMemberDetailModal from './StaffMemberDetailModal';
@@ -87,24 +89,8 @@ const RestaurantStaffScreen = ({
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size='large' color={COLORS.primary.terracota} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>No se pudo cargar el personal.</Text>
-        <Pressable style={styles.retryButton} onPress={loadStaff}>
-          <Text style={styles.retryButtonText}>Reintentar</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  if (loading) return <ScreenLoader />;
+  if (error) return <ScreenError message='No se pudo cargar el personal.' onRetry={loadStaff} />;
 
   return (
     <View style={styles.container}>
@@ -156,28 +142,6 @@ const RestaurantStaffScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.large,
-    gap: SPACING.medium,
-  },
-  errorText: {
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.gris_oscuro,
-    textAlign: 'center',
-  },
-  retryButton: {
-    paddingHorizontal: SPACING.large,
-    paddingVertical: SPACING.small,
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: COLORS.primary.terracota,
-  },
-  retryButtonText: {
-    color: COLORS.common.blanco,
-    fontWeight: '700',
   },
   addRow: {
     paddingHorizontal: SPACING.medium,
