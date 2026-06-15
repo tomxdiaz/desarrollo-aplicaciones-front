@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
   },
   sheet: {
     padding: SPACING.large,
+    paddingBottom: SPACING.extra_large,
     gap: SPACING.medium,
   },
   iconWrap: {

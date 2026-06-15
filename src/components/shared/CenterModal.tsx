@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { COLORS } from '../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
@@ -12,17 +12,18 @@ type CenterModalProps = {
 const CenterModal = ({ visible, onClose, children }: CenterModalProps) => {
   return (
     <Modal visible={visible} transparent animationType='fade' onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <KeyboardAwareScrollView
-          style={styles.sheetWrapper}
-          contentContainerStyle={styles.sheet}
-          keyboardShouldPersistTaps='handled'
-          enableOnAndroid
-          extraScrollHeight={80}
-          showsVerticalScrollIndicator={false}>
-          {children}
-        </KeyboardAwareScrollView>
-      </View>
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable style={styles.sheetWrapper} onPress={() => {}}>
+          <KeyboardAwareScrollView
+            contentContainerStyle={styles.sheet}
+            keyboardShouldPersistTaps='handled'
+            enableOnAndroid
+            extraScrollHeight={80}
+            showsVerticalScrollIndicator={false}>
+            {children}
+          </KeyboardAwareScrollView>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 };
@@ -43,6 +44,7 @@ const styles = StyleSheet.create({
   },
   sheet: {
     padding: SPACING.large,
+    paddingBottom: SPACING.extra_large,
     gap: SPACING.medium,
   },
 });

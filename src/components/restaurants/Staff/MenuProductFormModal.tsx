@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: SPACING.medium,
-    paddingBottom: SPACING.small,
+    paddingBottom: SPACING.extra_large,
   },
   input: {
     borderWidth: 1,
