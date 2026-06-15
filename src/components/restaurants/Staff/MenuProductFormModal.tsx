@@ -119,7 +119,6 @@ const MenuProductFormModal = ({
       <KeyboardAwareScrollView
         contentContainerStyle={styles.form}
         keyboardShouldPersistTaps='handled'
-        enableOnAndroid
         extraScrollHeight={80}
         showsVerticalScrollIndicator={false}>
         <FormField label='Imagen'>

@@ -17,7 +17,6 @@ const CenterModal = ({ visible, onClose, children }: CenterModalProps) => {
           <KeyboardAwareScrollView
             contentContainerStyle={styles.sheet}
             keyboardShouldPersistTaps='handled'
-            enableOnAndroid
             extraScrollHeight={80}
             showsVerticalScrollIndicator={false}>
             {children}

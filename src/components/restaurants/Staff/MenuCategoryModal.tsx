@@ -70,7 +70,6 @@ const MenuCategoryModal = ({
           <KeyboardAwareScrollView
             contentContainerStyle={styles.sheet}
             keyboardShouldPersistTaps='handled'
-            enableOnAndroid
             extraScrollHeight={80}
             showsVerticalScrollIndicator={false}>
             <View style={styles.iconWrap}>
