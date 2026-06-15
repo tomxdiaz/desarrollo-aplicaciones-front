@@ -8,6 +8,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { RestaurantStaff, RestaurantStaffEnum } from '../../../types/types';
 import { RESTAURANT_STAFF_ROLE_LABELS, getRestaurantStaffRoleStyle } from '../../../types/restaurant-staff-role';
+import RolePicker from '../../shared/RolePicker';
 
 const StaffMemberDetailModal = ({
   member,
@@ -88,21 +89,11 @@ const StaffMemberDetailModal = ({
                 <>
                   <View style={styles.roleChangeSection}>
                     <Text style={styles.sectionLabel}>Cambiar rol</Text>
-                    <View style={styles.rolePillsRow}>
-                      {assignableRoles.map((role) => {
-                        const isActive = pendingRole === role;
-                        return (
-                          <Pressable
-                            key={role}
-                            style={[styles.rolePill, isActive ? styles.rolePillActive : styles.rolePillInactive]}
-                            onPress={() => setPendingRole(role)}>
-                            <Text style={[styles.rolePillText, isActive ? styles.rolePillTextActive : styles.rolePillTextInactive]}>
-                              {RESTAURANT_STAFF_ROLE_LABELS[role]}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
+                    <RolePicker
+                      roles={assignableRoles}
+                      selectedRole={pendingRole}
+                      onSelect={setPendingRole}
+                    />
                   </View>
 
                   {canConfirm ? (
@@ -204,36 +195,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_base,
     fontWeight: '700',
     color: COLORS.common.negro_principal,
-  },
-  rolePillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.small,
-  },
-  rolePill: {
-    height: 34,
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.medium,
-    borderRadius: BORDER_RADIUS.large,
-    borderWidth: 1,
-  },
-  rolePillActive: {
-    backgroundColor: COLORS.primary.terracota,
-    borderColor: COLORS.primary.terracota,
-  },
-  rolePillInactive: {
-    backgroundColor: COLORS.common.blanco,
-    borderColor: COLORS.surface.borde_calido,
-  },
-  rolePillText: {
-    fontSize: FONT_SIZES.text_small,
-    fontWeight: '600',
-  },
-  rolePillTextActive: {
-    color: COLORS.common.blanco,
-  },
-  rolePillTextInactive: {
-    color: COLORS.primary.terracota,
   },
   confirmButton: {
     alignItems: 'center',
