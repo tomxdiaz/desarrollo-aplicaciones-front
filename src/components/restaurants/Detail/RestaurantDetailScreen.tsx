@@ -11,21 +11,7 @@ import { restaurantService } from '../../../services/restaurant.service';
 import { Restaurant } from '../../../types/types';
 import { useHeaderRestaurant } from '../../../providers/header-restaurant.provider';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-
-function parseTableCode(code: string) {
-  const clean = code.trim();
-
-  const parts = clean.split('/');
-
-  if (parts.length !== 2 || !parts[0] || !parts[1]) {
-    return null;
-  }
-
-  return {
-    restaurantId: parts[0],
-    tableCode: parts[1],
-  };
-}
+import { goToScannedTable } from '../../../utils/qr';
 
 const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
@@ -41,27 +27,6 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const { setRestaurantName } = useHeaderRestaurant();
 
   const TABLE_CODE_REGEX = /^[A-Za-z0-9 _-]+$/;
-
-  const goToMenu = (rawCode: string) => {
-    const parsed = parseTableCode(rawCode);
-
-    if (!parsed) {
-      Alert.alert('Código inválido', 'El formato del QR no es válido.');
-      return;
-    }
-
-    const tableExists = restaurant?.tables?.some((t) => t.code.toUpperCase() === parsed.tableCode.toUpperCase());
-
-    if (!tableExists) {
-      Alert.alert('Mesa no encontrada', 'Esa mesa no existe en este restaurante.');
-      return;
-    }
-
-    router.push({
-      pathname: '/restaurants/[id]/menu',
-      params: { id: parsed.restaurantId, table: parsed.tableCode },
-    });
-  };
 
   const handleGoToMenuManual = () => {
     const code = tableInput.trim();
@@ -134,7 +99,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
 
             setScanned(true);
             setScanning(false);
-            goToMenu(data);
+            goToScannedTable(data);
           }}
         />
 
