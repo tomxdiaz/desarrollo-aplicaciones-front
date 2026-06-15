@@ -10,6 +10,7 @@ import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
+import { menuCategoryStyles } from '../../../constants/menuCategoryStyles';
 import MenuCategoryModal from './MenuCategoryModal';
 import MenuProductFormModal from './MenuProductFormModal';
 import DeleteMenuItemModal from './DeleteMenuItemModal';
@@ -268,6 +269,7 @@ const RestaurantMenuManagementScreen = ({
 };
 
 const styles = StyleSheet.create({
+  ...menuCategoryStyles,
   container: {
     flex: 1,
   },
@@ -340,49 +342,15 @@ const styles = StyleSheet.create({
     color: COLORS.common.gris_medio,
     fontSize: FONT_SIZES.text_base,
   },
-  categoryBlock: {
-    gap: SPACING.small,
-  },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: SPACING.small,
   },
-  categoryTitleRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.small,
-  },
-  categoryMarker: {
-    width: 6,
-    height: 24,
-    borderRadius: 999,
-    backgroundColor: COLORS.primary.terracota,
-  },
-  categoryTitle: {
-    fontSize: FONT_SIZES.title_small,
-    fontWeight: '800',
-    color: COLORS.common.negro_principal,
-  },
-  counterPill: {
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: COLORS.surface.tarjeta_calida,
-    paddingHorizontal: SPACING.small,
-    paddingVertical: 3,
-  },
-  counterPillText: {
-    color: COLORS.common.gris_oscuro,
-    fontWeight: '700',
-    fontSize: FONT_SIZES.text_small,
-  },
   categoryActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.small,
-  },
-  categoryContent: {
     gap: SPACING.small,
   },
   productCard: {

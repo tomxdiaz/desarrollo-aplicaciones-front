@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Alert, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { orderService } from '../../../services/order.service';
 import { ALL_ORDER_STATUS_FILTER, OrderStatusFilter } from '../../../types/restaurant-order-status';
 import { Order, OrderStatus } from '../../../types/order.types';
 import { RestaurantTable } from '../../../types/types';
 import { COLORS } from '../../../constants/colors';
-import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
+import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import ScreenLoader from '../../shared/ScreenLoader';
+import ScreenError from '../../shared/ScreenError';
 import OrderStatusFilterTabs from './OrderStatusFilterTabs';
 import StaffOrderCard from './StaffOrderCard';
 import StaffOrderDetailModal from './StaffOrderDetailModal';
@@ -103,31 +105,8 @@ const RestaurantOrdersScreen = ({ restaurantId, tables, openOrderForTable, onOrd
     [orders, statusFilter],
   );
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size='large' color={COLORS.primary.terracota} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>No se pudieron cargar los pedidos.</Text>
-
-        <Pressable
-          style={styles.retryButton}
-          onPress={() => {
-            loadOrders().catch((err) => {
-              console.error('Unexpected error retrying restaurant orders:', err);
-            });
-          }}>
-          <Text style={styles.retryButtonText}>Reintentar</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  if (loading) return <ScreenLoader />;
+  if (error) return <ScreenError message='No se pudieron cargar los pedidos.' onRetry={loadOrders} />;
 
   return (
     <View style={styles.container}>
@@ -164,28 +143,6 @@ const RestaurantOrdersScreen = ({ restaurantId, tables, openOrderForTable, onOrd
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.large,
-    gap: SPACING.medium,
-  },
-  errorText: {
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.gris_oscuro,
-    textAlign: 'center',
-  },
-  retryButton: {
-    paddingHorizontal: SPACING.large,
-    paddingVertical: SPACING.small,
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: COLORS.primary.terracota,
-  },
-  retryButtonText: {
-    color: COLORS.common.blanco,
-    fontWeight: '700',
   },
   listContent: {
     padding: SPACING.medium,
