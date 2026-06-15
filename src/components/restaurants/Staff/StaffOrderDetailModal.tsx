@@ -1,9 +1,9 @@
-import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import BottomSheetModal from '../../shared/BottomSheetModal';
+import ModalHeader from '../../shared/ModalHeader';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
-import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { formatPrice } from '../../../utils/menu';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../../types/restaurant-order-status';
 import { Order, OrderStatus } from '../../../types/order.types';
@@ -47,27 +47,14 @@ const StaffOrderDetailModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType='fade' onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose}>
-        {/* Inner press is captured so tapping the sheet doesn't close the modal. */}
-        <Pressable style={styles.sheet} onPress={() => {}}>
+    <BottomSheetModal visible={visible} onClose={onClose}>
           {order ? (
             <>
-              <View style={styles.header}>
-                <View style={styles.headerTexts}>
-                  <Text style={styles.title}>Pedido #{order.number}</Text>
-                  <Text style={styles.subtitle}>
-                    {tableLabel} · {formatDateTime(order.created_at)}
-                  </Text>
-                </View>
-                <Pressable
-                  style={styles.closeButton}
-                  onPress={onClose}
-                  accessibilityRole='button'
-                  accessibilityLabel='Cerrar'>
-                  <Ionicons name='close' size={ICON_SIZES.small} color={COLORS.common.gris_oscuro} />
-                </Pressable>
-              </View>
+              <ModalHeader
+                title={`Pedido #${order.number}`}
+                subtitle={`${tableLabel} · ${formatDateTime(order.created_at)}`}
+                onClose={onClose}
+              />
 
               <View style={[styles.statusChip, { backgroundColor: `${statusColor}1A` }]}>
                 <View style={[styles.dot, { backgroundColor: statusColor }]} />
@@ -126,55 +113,11 @@ const StaffOrderDetailModal = ({
               ) : null}
             </>
           ) : null}
-        </Pressable>
-      </Pressable>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: COLORS.surface.fondo_crema,
-    borderTopLeftRadius: BORDER_RADIUS.large,
-    borderTopRightRadius: BORDER_RADIUS.large,
-    padding: SPACING.large,
-    gap: SPACING.medium,
-    maxHeight: '85%',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: SPACING.small,
-  },
-  headerTexts: {
-    flexShrink: 1,
-    gap: SPACING.extra_small,
-  },
-  title: {
-    fontSize: FONT_SIZES.title_small,
-    fontWeight: '800',
-    color: COLORS.common.negro_principal,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.text_small,
-    color: COLORS.common.gris_medio,
-  },
-  closeButton: {
-    width: ICON_SIZES.large,
-    height: ICON_SIZES.large,
-    borderRadius: ICON_SIZES.large,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.common.blanco,
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-  },
   statusChip: {
     flexDirection: 'row',
     alignItems: 'center',

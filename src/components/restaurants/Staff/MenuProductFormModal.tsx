@@ -3,13 +3,14 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import BottomSheetModal from '../../shared/BottomSheetModal';
+import ModalHeader from '../../shared/ModalHeader';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Category, CreateProductPayload, ImageFile, Product } from '../../../types/types';
@@ -107,17 +108,22 @@ const MenuProductFormModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType='slide' onRequestClose={handleClose}>
-      <Pressable style={styles.overlay} onPress={handleClose}>
-        <Pressable style={styles.sheet} onPress={() => {}}>
+    <BottomSheetModal
+      visible={visible}
+      onClose={handleClose}
+      animationType='slide'
+      maxHeight='92%'
+      sheetStyle={styles.sheetOverride}>
           <View style={styles.handle} />
 
-          <View style={styles.header}>
-            <Text style={styles.title}>{isEditing ? 'Editar producto' : 'Nuevo producto'}</Text>
-            <Pressable style={styles.closeButton} onPress={handleClose} disabled={submitting}>
-              <Ionicons name='close' size={ICON_SIZES.small} color={COLORS.common.gris_oscuro} />
-            </Pressable>
-          </View>
+          <ModalHeader
+            title={isEditing ? 'Editar producto' : 'Nuevo producto'}
+            onClose={handleClose}
+            disabled={submitting}
+            style={styles.headerOverride}
+            titleStyle={styles.titleOverride}
+            closeButtonStyle={styles.closeButtonOverride}
+          />
 
           <KeyboardAwareScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps='handled' enableOnAndroid extraScrollHeight={80} showsVerticalScrollIndicator={false}>
               <View style={styles.field}>
@@ -205,26 +211,18 @@ const MenuProductFormModal = ({
                 )}
               </Pressable>
           </KeyboardAwareScrollView>
-        </Pressable>
-      </Pressable>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
+  sheetOverride: {
     backgroundColor: COLORS.common.blanco,
-    borderTopLeftRadius: BORDER_RADIUS.large,
-    borderTopRightRadius: BORDER_RADIUS.large,
+    padding: 0,
+    gap: 0,
     paddingHorizontal: SPACING.large,
     paddingBottom: SPACING.extra_large,
     paddingTop: SPACING.small,
-    maxHeight: '92%',
   },
   handle: {
     alignSelf: 'center',
@@ -234,25 +232,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface.borde_calido,
     marginBottom: SPACING.medium,
   },
-  header: {
-    flexDirection: 'row',
+  headerOverride: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 0,
     marginBottom: SPACING.medium,
   },
-  title: {
+  titleOverride: {
     fontSize: FONT_SIZES.title_base,
-    fontWeight: '800',
-    color: COLORS.common.negro_principal,
   },
-  closeButton: {
-    width: ICON_SIZES.large,
-    height: ICON_SIZES.large,
-    borderRadius: ICON_SIZES.large,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
+  closeButtonOverride: {
     backgroundColor: COLORS.surface.fondo_crema,
   },
   form: {
