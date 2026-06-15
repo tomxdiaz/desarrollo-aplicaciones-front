@@ -8,9 +8,16 @@ import { ICON_SIZES } from '../../constants/icon_sizes';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 
-const RestaurantCard = ({ restaurant }: { restaurant: Restaurant }) => {
+const RestaurantCard = ({
+  restaurant,
+  routePrefix = '/restaurants',
+}: {
+  restaurant: Restaurant;
+  /** Route prefix used for navigation. Defaults to '/restaurants'. */
+  routePrefix?: string;
+}) => {
   const handlePress = () => {
-    router.push(`/restaurants/${restaurant.id}`);
+    router.push(`${routePrefix}/${restaurant.id}`);
   };
 
   return (
