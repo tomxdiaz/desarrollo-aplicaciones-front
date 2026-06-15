@@ -72,7 +72,7 @@ const MyRestaurantDetailScreen = ({ id }: MyRestaurantDetailScreenProps) => {
 
   useFocusEffect(
     useCallback(() => {
-      void loadData();
+      loadData().catch(console.error);
     }, [loadData]),
   );
 

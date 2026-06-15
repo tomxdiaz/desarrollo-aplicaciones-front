@@ -1,7 +1,7 @@
 import { Pressable, StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
-import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
+import { SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { ICON_SIZES } from '../../constants/icon_sizes';
 
@@ -20,15 +20,7 @@ type ModalHeaderProps = {
   closeButtonStyle?: StyleProp<ViewStyle>;
 };
 
-const ModalHeader = ({
-  title,
-  subtitle,
-  onClose,
-  disabled,
-  style,
-  titleStyle,
-  closeButtonStyle,
-}: ModalHeaderProps) => {
+const ModalHeader = ({ title, subtitle, onClose, disabled, style, titleStyle, closeButtonStyle }: ModalHeaderProps) => {
   return (
     <View style={[styles.header, style]}>
       <View style={styles.headerTexts}>

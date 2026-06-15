@@ -13,13 +13,14 @@ import StaffMemberCard from './StaffMemberCard';
 import AddStaffModal from './AddStaffModal';
 import StaffMemberDetailModal from './StaffMemberDetailModal';
 
-const RestaurantStaffScreen = ({
-  restaurantId,
-  currentUserStaffInfo,
-}: {
+type RestaurantStaffScreenProps = Readonly<{
   restaurantId: string;
   currentUserStaffInfo: RestaurantStaff;
-}) => {
+}>;
+
+const StaffItemSeparator = () => <View style={styles.itemSeparator} />;
+
+const RestaurantStaffScreen = ({ restaurantId, currentUserStaffInfo }: RestaurantStaffScreenProps) => {
   const [staffList, setStaffList] = useState<RestaurantStaff[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -32,7 +33,9 @@ const RestaurantStaffScreen = ({
   const loadStaff = useCallback(async () => {
     try {
       setError(false);
+
       const data = await restaurantStaffService.getRestaurantStaff(restaurantId);
+
       setStaffList(data);
     } catch (err) {
       console.error('Error fetching restaurant staff:', err);
@@ -45,47 +48,75 @@ const RestaurantStaffScreen = ({
 
   useFocusEffect(
     useCallback(() => {
-      loadStaff();
+      loadStaff().catch((err) => {
+        console.error('Unexpected error loading restaurant staff:', err);
+      });
     }, [loadStaff]),
   );
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    loadStaff();
-  };
 
-  const handleAdd = async (payload: CreateStaffPayload) => {
-    await restaurantStaffService.addStaff(restaurantId, payload);
-    await loadStaff();
-  };
+    loadStaff().catch((err) => {
+      console.error('Unexpected error refreshing restaurant staff:', err);
+    });
+  }, [loadStaff]);
 
-  const handleChangeRole = async (member: RestaurantStaff, newRole: RestaurantStaffEnum) => {
-    const snapshot = staffList;
-    setStaffList((current) =>
-      current.map((item) => (item.user_id === member.user_id ? { ...item, role: newRole } : item)),
-    );
-    setSelectedMember(null);
-    try {
-      await restaurantStaffService.updateStaffRole(restaurantId, member.user_id, newRole);
-    } catch (err) {
-      setStaffList(snapshot);
-      console.error('Error updating staff role:', err);
-      Alert.alert('Error', 'No se pudo actualizar el rol. Intentá de nuevo.');
-    }
-  };
+  const handleRetry = useCallback(() => {
+    setLoading(true);
 
-  const handleRemove = async (member: RestaurantStaff) => {
-    const snapshot = staffList;
-    setStaffList((current) => current.filter((item) => item.user_id !== member.user_id));
-    setSelectedMember(null);
-    try {
-      await restaurantStaffService.removeStaff(restaurantId, member.user_id);
-    } catch (err) {
-      setStaffList(snapshot);
-      console.error('Error removing staff member:', err);
-      Alert.alert('Error', 'No se pudo eliminar al integrante. Intentá de nuevo.');
-    }
-  };
+    loadStaff().catch((err) => {
+      console.error('Unexpected error retrying restaurant staff:', err);
+    });
+  }, [loadStaff]);
+
+  const handleAdd = useCallback(
+    async (payload: CreateStaffPayload) => {
+      await restaurantStaffService.addStaff(restaurantId, payload);
+      await loadStaff();
+    },
+    [restaurantId, loadStaff],
+  );
+
+  const handleChangeRole = useCallback(
+    async (member: RestaurantStaff, newRole: RestaurantStaffEnum) => {
+      const snapshot = staffList;
+
+      setStaffList((current) => current.map((item) => (item.user_id === member.user_id ? { ...item, role: newRole } : item)));
+
+      setSelectedMember(null);
+
+      try {
+        await restaurantStaffService.updateStaffRole(restaurantId, member.user_id, newRole);
+      } catch (err) {
+        setStaffList(snapshot);
+        console.error('Error updating staff role:', err);
+
+        Alert.alert('Error', 'No se pudo actualizar el rol. Intentá de nuevo.');
+      }
+    },
+    [restaurantId, staffList],
+  );
+
+  const handleRemove = useCallback(
+    async (member: RestaurantStaff) => {
+      const snapshot = staffList;
+
+      setStaffList((current) => current.filter((item) => item.user_id !== member.user_id));
+
+      setSelectedMember(null);
+
+      try {
+        await restaurantStaffService.removeStaff(restaurantId, member.user_id);
+      } catch (err) {
+        setStaffList(snapshot);
+        console.error('Error removing staff member:', err);
+
+        Alert.alert('Error', 'No se pudo eliminar al integrante. Intentá de nuevo.');
+      }
+    },
+    [restaurantId, staffList],
+  );
 
   if (loading) {
     return (
@@ -99,7 +130,8 @@ const RestaurantStaffScreen = ({
     return (
       <View style={styles.centered}>
         <Text style={styles.errorText}>No se pudo cargar el personal.</Text>
-        <Pressable style={styles.retryButton} onPress={loadStaff}>
+
+        <Pressable style={styles.retryButton} onPress={handleRetry}>
           <Text style={styles.retryButtonText}>Reintentar</Text>
         </Pressable>
       </View>
@@ -112,6 +144,7 @@ const RestaurantStaffScreen = ({
         <View style={styles.addRow}>
           <Pressable style={styles.addButton} onPress={() => setAddModalVisible(true)}>
             <Ionicons name='person-add-outline' size={ICON_SIZES.small} color={COLORS.common.blanco} />
+
             <Text style={styles.addButtonText}>Agregar personal</Text>
           </Pressable>
         </View>
@@ -129,7 +162,7 @@ const RestaurantStaffScreen = ({
             onPress={() => setSelectedMember(item)}
           />
         )}
-        ItemSeparatorComponent={() => <View style={{ height: SPACING.small }} />}
+        ItemSeparatorComponent={StaffItemSeparator}
         ListEmptyComponent={<Text style={styles.emptyText}>No hay personal registrado</Text>}
       />
 
@@ -201,6 +234,9 @@ const styles = StyleSheet.create({
   listContent: {
     padding: SPACING.medium,
     paddingBottom: SPACING.extra_large,
+  },
+  itemSeparator: {
+    height: SPACING.small,
   },
   emptyText: {
     fontSize: FONT_SIZES.text_base,

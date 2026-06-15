@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
 import { supabaseService } from '../services/supabase.service';
@@ -14,6 +14,10 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
+type AuthProviderProps = Readonly<{
+  children: React.ReactNode;
+}>;
+
 const AuthContext = createContext<AuthContextType>({
   session: null,
   appUser: null,
@@ -23,34 +27,36 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadAppUser = async (session: Session | null) => {
-    if (!session) {
+  const loadAppUser = useCallback(async (currentSession: Session | null) => {
+    if (!currentSession) {
       console.log('[AuthProvider] loadAppUser: session is null → setAppUser(null)');
       setAppUser(null);
       return;
     }
 
     console.log('[AuthProvider] loadAppUser: calling /app_user/me...');
-    const appUser = await appUserService.getMyAppUser();
-    console.log('[AuthProvider] loadAppUser: success →', appUser.email, appUser.global_role);
-    setAppUser(appUser);
-  };
 
-  const signIn = async (email: string, password: string) => {
+    const loadedAppUser = await appUserService.getMyAppUser();
+
+    console.log('[AuthProvider] loadAppUser: success →', loadedAppUser.email, loadedAppUser.global_role);
+
+    setAppUser(loadedAppUser);
+  }, []);
+
+  const signIn = useCallback(async (email: string, password: string) => {
     await supabaseService.signIn(email, password);
-    // No hace falta setear acá si onAuthStateChange lo va a capturar.
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = useCallback(async (email: string, password: string) => {
     await supabaseService.signUp(email, password);
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     setSession(null);
     setAppUser(null);
 
@@ -59,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error signing out:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -69,16 +75,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('[AuthProvider] initAuth: started');
 
       const {
-        data: { session },
+        data: { session: initialSession },
       } = await supabase.auth.getSession();
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      console.log('[AuthProvider] initAuth: getSession() →', session ? `session exists (user: ${session.user.email})` : 'null');
-      setSession(session);
+      console.log(
+        '[AuthProvider] initAuth: getSession() →',
+        initialSession ? `session exists (user: ${initialSession.user.email})` : 'null',
+      );
+
+      setSession(initialSession);
 
       try {
-        await loadAppUser(session);
+        await loadAppUser(initialSession);
       } catch (error) {
         console.error('[AuthProvider] initAuth: loadAppUser FAILED →', error);
         setAppUser(null);
@@ -90,23 +102,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    initAuth();
+    initAuth().catch((error) => {
+      console.error('[AuthProvider] initAuth FAILED →', error);
+
+      if (mounted) {
+        setSession(null);
+        setAppUser(null);
+        setLoading(false);
+      }
+    });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AuthProvider] onAuthStateChange: event =', event, '| session =', session ? session.user.email : 'null');
+    } = supabase.auth.onAuthStateChange(async (event, updatedSession) => {
+      console.log('[AuthProvider] onAuthStateChange: event =', event, '| session =', updatedSession ? updatedSession.user.email : 'null');
 
       if (event === 'TOKEN_REFRESHED') {
-        setSession(session);
+        setSession(updatedSession);
         return;
       }
 
       setLoading(true);
-      setSession(session);
+      setSession(updatedSession);
 
       try {
-        await loadAppUser(session);
+        await loadAppUser(updatedSession);
       } catch (error) {
         console.error('[AuthProvider] onAuthStateChange: loadAppUser FAILED →', error);
         setAppUser(null);
@@ -120,21 +140,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loadAppUser]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        session,
-        appUser,
-        loading,
-        signIn,
-        signUp,
-        signOut,
-      }}>
-      {children}
-    </AuthContext.Provider>
+  const contextValue = useMemo<AuthContextType>(
+    () => ({
+      session,
+      appUser,
+      loading,
+      signIn,
+      signUp,
+      signOut,
+    }),
+    [session, appUser, loading, signIn, signUp, signOut],
   );
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);

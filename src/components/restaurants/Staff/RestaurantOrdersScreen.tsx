@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { orderService } from '../../../services/order.service';
@@ -12,17 +12,16 @@ import OrderStatusFilterTabs from './OrderStatusFilterTabs';
 import StaffOrderCard from './StaffOrderCard';
 import StaffOrderDetailModal from './StaffOrderDetailModal';
 
-const RestaurantOrdersScreen = ({
-  restaurantId,
-  tables,
-  openOrderForTable,
-  onOrderOpened,
-}: {
+type RestaurantOrdersScreenProps = Readonly<{
   restaurantId: string;
   tables: RestaurantTable[];
   openOrderForTable: number | null;
   onOrderOpened: () => void;
-}) => {
+}>;
+
+const OrderItemSeparator = () => <View style={styles.itemSeparator} />;
+
+const RestaurantOrdersScreen = ({ restaurantId, tables, openOrderForTable, onOrderOpened }: RestaurantOrdersScreenProps) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
@@ -30,13 +29,16 @@ const RestaurantOrdersScreen = ({
   const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>(ALL_ORDER_STATUS_FILTER);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
-  const tablesById = new Map(tables.map((table) => [table.id, table]));
+  const tablesById = useMemo(() => new Map(tables.map((table) => [table.id, table])), [tables]);
+
   const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
 
   const loadOrders = useCallback(async () => {
     try {
       setError(false);
+
       const data = await orderService.getRestaurantOrders(restaurantId);
+
       setOrders(data);
     } catch (err) {
       console.error('Error fetching restaurant orders:', err);
@@ -49,47 +51,57 @@ const RestaurantOrdersScreen = ({
 
   useFocusEffect(
     useCallback(() => {
-      loadOrders();
+      loadOrders().catch((err) => {
+        console.error('Unexpected error loading restaurant orders:', err);
+      });
     }, [loadOrders]),
   );
 
-  // When the user taps "Ver pedido" on an occupied table, jump straight to the
-  // detail of that table's latest active (pending / in process) order.
   useEffect(() => {
-    if (openOrderForTable === null || loading) return;
+    if (openOrderForTable === null || loading) {
+      return;
+    }
 
-    const latestActive = orders
-      .filter(
-        (order) =>
-          order.table_id === openOrderForTable &&
-          (order.status === 'PENDING' || order.status === 'IN_PROCESS'),
-      )
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+    const latestActiveOrder = orders
+      .filter((order) => order.table_id === openOrderForTable && (order.status === 'PENDING' || order.status === 'IN_PROCESS'))
+      .sort((firstOrder, secondOrder) => new Date(secondOrder.created_at).getTime() - new Date(firstOrder.created_at).getTime())[0];
 
-    if (latestActive) {
-      setSelectedOrderId(latestActive.id);
+    if (latestActiveOrder) {
+      setSelectedOrderId(latestActiveOrder.id);
     }
 
     onOrderOpened();
   }, [openOrderForTable, loading, orders, onOrderOpened]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    loadOrders();
-  };
 
-  const handleUpdateStatus = async (order: Order, status: OrderStatus) => {
-    try {
-      const updated = await orderService.updateOrderStatus(restaurantId, String(order.id), status);
-      setOrders((current) => current.map((item) => (item.id === updated.id ? updated : item)));
-    } catch (err) {
-      console.error('Error updating order status:', err);
-      Alert.alert('Error', 'No se pudo actualizar el estado del pedido. Intentá de nuevo.');
-    }
-  };
+    loadOrders().catch((err) => {
+      console.error('Unexpected error refreshing restaurant orders:', err);
+    });
+  }, [loadOrders]);
 
-  const filteredOrders =
-    statusFilter === ALL_ORDER_STATUS_FILTER ? orders : orders.filter((order) => order.status === statusFilter);
+  const handleUpdateStatus = useCallback(
+    async (order: Order, status: OrderStatus) => {
+      try {
+        const updatedOrder = await orderService.updateOrderStatus(restaurantId, String(order.id), status);
+
+        setOrders((currentOrders) =>
+          currentOrders.map((currentOrder) => (currentOrder.id === updatedOrder.id ? updatedOrder : currentOrder)),
+        );
+      } catch (err) {
+        console.error('Error updating order status:', err);
+
+        Alert.alert('Error', 'No se pudo actualizar el estado del pedido. Intentá de nuevo.');
+      }
+    },
+    [restaurantId],
+  );
+
+  const filteredOrders = useMemo(
+    () => (statusFilter === ALL_ORDER_STATUS_FILTER ? orders : orders.filter((order) => order.status === statusFilter)),
+    [orders, statusFilter],
+  );
 
   if (loading) {
     return (
@@ -103,7 +115,14 @@ const RestaurantOrdersScreen = ({
     return (
       <View style={styles.centered}>
         <Text style={styles.errorText}>No se pudieron cargar los pedidos.</Text>
-        <Pressable style={styles.retryButton} onPress={loadOrders}>
+
+        <Pressable
+          style={styles.retryButton}
+          onPress={() => {
+            loadOrders().catch((err) => {
+              console.error('Unexpected error retrying restaurant orders:', err);
+            });
+          }}>
           <Text style={styles.retryButtonText}>Reintentar</Text>
         </Pressable>
       </View>
@@ -127,7 +146,7 @@ const RestaurantOrdersScreen = ({
             onPress={() => setSelectedOrderId(item.id)}
           />
         )}
-        ItemSeparatorComponent={() => <View style={{ height: SPACING.small }} />}
+        ItemSeparatorComponent={OrderItemSeparator}
         ListEmptyComponent={<Text style={styles.emptyText}>No hay pedidos en esta categoría</Text>}
       />
 
@@ -171,6 +190,9 @@ const styles = StyleSheet.create({
   listContent: {
     padding: SPACING.medium,
     paddingBottom: SPACING.extra_large,
+  },
+  itemSeparator: {
+    height: SPACING.small,
   },
   emptyText: {
     fontSize: FONT_SIZES.text_base,

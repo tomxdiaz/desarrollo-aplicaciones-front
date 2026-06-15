@@ -24,9 +24,9 @@ type BackendError = {
 
 export class ApiError extends Error {
   status: number;
-  data: BackendError | unknown;
+  data: unknown;
 
-  constructor(message: string, status: number, data: BackendError | unknown) {
+  constructor(message: string, status: number, data: unknown) {
     super(message);
 
     this.name = 'ApiError';
@@ -37,9 +37,30 @@ export class ApiError extends Error {
 
 let accessToken: string | null = null;
 
-supabase.auth.getSession().then(({ data }) => {
-  accessToken = data.session?.access_token ?? null;
-});
+const retriedRequests = new WeakSet<object>();
+
+const getErrorMessage = (responseData: unknown, fallbackMessage: string): string => {
+  if (typeof responseData !== 'object' || responseData === null || !('message' in responseData)) {
+    return fallbackMessage;
+  }
+
+  const { message } = responseData;
+
+  if (Array.isArray(message)) {
+    return message.join(', ');
+  }
+
+  return String(message);
+};
+
+supabase.auth
+  .getSession()
+  .then(({ data }) => {
+    accessToken = data.session?.access_token ?? null;
+  })
+  .catch((error: unknown) => {
+    console.error('Error getting initial Supabase session:', error);
+  });
 
 supabase.auth.onAuthStateChange((_event, session) => {
   accessToken = session?.access_token ?? null;
@@ -70,32 +91,34 @@ axiosInstance.interceptors.request.use(
       }
 
       config.headers.Authorization = `Bearer ${accessToken}`;
-      console.log('[apiClient] Sending token (first 20 chars):', accessToken?.slice(0, 20));
     }
 
     delete config.headers.requireAuth;
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error: unknown) => {
+    throw error;
+  },
 );
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<BackendError>) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    const wasRetried = originalRequest !== undefined && retriedRequests.has(originalRequest);
+
+    if (error.response?.status === 401 && originalRequest && !wasRetried) {
+      retriedRequests.add(originalRequest);
 
       const { data, error: refreshError } = await supabase.auth.refreshSession();
 
       if (!refreshError && data.session) {
         accessToken = data.session.access_token;
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${accessToken}`,
-        };
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
         return axiosInstance.request(originalRequest);
       }
 
@@ -103,21 +126,13 @@ axiosInstance.interceptors.response.use(
     }
 
     const status = error.response?.status ?? 500;
+    const responseData: unknown = error.response?.data ?? null;
 
-    const data = error.response?.data ?? null;
+    const message = getErrorMessage(responseData, error.message);
 
-    const message =
-      typeof data === 'object' && data !== null && 'message' in data
-        ? Array.isArray(data.message)
-          ? data.message.join(', ')
-          : data.message
-        : error.message;
-
-    return Promise.reject(new ApiError(message, status, data));
+    throw new ApiError(message, status, responseData);
   },
 );
-
-// API CLIENT
 
 export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
   const { method = 'GET', body, headers = {}, requireAuth = true } = options;
@@ -130,8 +145,6 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     data: body,
     headers: {
       ...headers,
-      // For multipart uploads let the native layer set the Content-Type so the
-      // proper boundary is included; overrides the JSON instance default.
       ...(isFormData ? { 'Content-Type': 'multipart/form-data' } : {}),
       requireAuth: String(requireAuth),
     },
