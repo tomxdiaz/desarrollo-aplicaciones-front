@@ -5,7 +5,13 @@ const canManageRestaurantResources = (role: RestaurantStaffEnum): boolean =>
 
 export const canManageTables = canManageRestaurantResources;
 
+// Every staff role can free up (close) an occupied table; creating/deleting tables stays gated by canManageTables.
+export const canFreeTable = (_role: RestaurantStaffEnum): boolean => true;
+
 export const canManageMenu = canManageRestaurantResources;
+
+// Every staff role can view the menu; only creating/editing is gated by canManageMenu.
+export const canViewMenu = (_role: RestaurantStaffEnum): boolean => true;
 
 // Every staff role can update order status; only table/staff/menu management is restricted.
 export const canUpdateOrderStatus = (_role: RestaurantStaffEnum): boolean => true;

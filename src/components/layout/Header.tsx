@@ -35,7 +35,7 @@ export default function Header() {
         <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
         <View>
           <Text style={styles.title}>Provecho!</Text>
-          <Text style={styles.slogan}>Hola soy el eslogan</Text>
+          <Text style={styles.slogan}>Del menú a tu mesa</Text>
         </View>
       </View>
       <TouchableOpacity onPress={handleToggleDrawer} style={styles.drawerButton}>

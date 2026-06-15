@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
-import { canManageTables } from '../../../utils/staffPermissions';
+import { canManageTables, canFreeTable } from '../../../utils/staffPermissions';
 import { tableService } from '../../../services/table.service';
 import { CreateTablePayload, RestaurantStaffEnum, RestaurantTable, RestaurantTableStatusEnum } from '../../../types/types';
 import { COLORS } from '../../../constants/colors';
@@ -33,6 +33,7 @@ const RestaurantTablesScreen = ({
   const [modalVisible, setModalVisible] = useState(false);
 
   const canManage = canManageTables(staffRole);
+  const canFree = canFreeTable(staffRole);
   const selectedTable = tables.find((table) => table.id === selectedTableId) ?? null;
 
   useFocusEffect(
@@ -115,6 +116,7 @@ const RestaurantTablesScreen = ({
           <TableDetailPanel
             table={selectedTable}
             canManage={canManage}
+            canFree={canFree}
             onViewOrders={onViewOrdersForTable}
             onCloseTable={handleCloseTable}
             onDeleteTable={handleDeleteTable}

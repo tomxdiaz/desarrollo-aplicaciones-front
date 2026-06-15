@@ -7,7 +7,7 @@ import { useAuth } from '../../../providers/auth.provider';
 import { AppRoleEnum, Restaurant, RestaurantStaff, RestaurantStaffEnum } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { restaurantStaffService } from '../../../services/restaurant_staff.service';
-import { canEditRestaurant, canManageMenu, canManageStaff } from '../../../utils/staffPermissions';
+import { canEditRestaurant, canViewMenu, canManageStaff } from '../../../utils/staffPermissions';
 import { COLORS } from '../../../constants/colors';
 import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
@@ -141,7 +141,7 @@ const MyRestaurantDetailScreen = ({ id }: MyRestaurantDetailScreenProps) => {
     }
 
     if (tab.key === 'menu') {
-      return canManageMenu(effectiveStaffRole);
+      return canViewMenu(effectiveStaffRole);
     }
 
     if (tab.key === 'staff') {

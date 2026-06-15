@@ -7,12 +7,14 @@ import { RestaurantTable, RestaurantTableStatusEnum } from '../../../types/types
 const TableDetailPanel = ({
   table,
   canManage,
+  canFree,
   onViewOrders,
   onCloseTable,
   onDeleteTable,
 }: {
   table: RestaurantTable;
   canManage: boolean;
+  canFree: boolean;
   onViewOrders: (tableId: number) => void;
   onCloseTable: (table: RestaurantTable) => void;
   onDeleteTable: (table: RestaurantTable) => void;
@@ -54,7 +56,7 @@ const TableDetailPanel = ({
           <Pressable style={styles.primaryButton} onPress={() => onViewOrders(table.id)}>
             <Text style={styles.primaryButtonText}>Ver pedido</Text>
           </Pressable>
-          {canManage ? (
+          {canFree ? (
             <Pressable style={styles.outlineButton} onPress={() => onCloseTable(table)}>
               <Text style={styles.outlineButtonText}>Cerrar mesa y liberar</Text>
             </Pressable>
