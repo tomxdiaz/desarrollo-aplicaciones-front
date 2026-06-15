@@ -8,7 +8,6 @@ export const supabaseService = {
     });
 
     if (!data || error) {
-      console.log(error);
       throw error;
     }
 
@@ -22,7 +21,6 @@ export const supabaseService = {
     });
 
     if (!data || error) {
-      console.log(error);
       throw error;
     }
   },

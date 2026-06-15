@@ -34,17 +34,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loadAppUser = useCallback(async (currentSession: Session | null) => {
     if (!currentSession) {
-      console.log('[AuthProvider] loadAppUser: session is null → setAppUser(null)');
       setAppUser(null);
       return;
     }
 
-    console.log('[AuthProvider] loadAppUser: calling /app_user/me...');
-
     const loadedAppUser = await appUserService.getMyAppUser();
-
-    console.log('[AuthProvider] loadAppUser: success →', loadedAppUser.email, loadedAppUser.global_role);
-
     setAppUser(loadedAppUser);
   }, []);
 
@@ -72,7 +66,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const initAuth = async () => {
       setLoading(true);
-      console.log('[AuthProvider] initAuth: started');
 
       const {
         data: { session: initialSession },
@@ -81,11 +74,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!mounted) {
         return;
       }
-
-      console.log(
-        '[AuthProvider] initAuth: getSession() →',
-        initialSession ? `session exists (user: ${initialSession.user.email})` : 'null',
-      );
 
       setSession(initialSession);
 
@@ -96,7 +84,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setAppUser(null);
       } finally {
         if (mounted) {
-          console.log('[AuthProvider] initAuth: done → setLoading(false)');
           setLoading(false);
         }
       }
@@ -115,8 +102,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, updatedSession) => {
-      console.log('[AuthProvider] onAuthStateChange: event =', event, '| session =', updatedSession ? updatedSession.user.email : 'null');
-
       if (event === 'TOKEN_REFRESHED') {
         setSession(updatedSession);
         return;
@@ -131,7 +116,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.error('[AuthProvider] onAuthStateChange: loadAppUser FAILED →', error);
         setAppUser(null);
       } finally {
-        console.log('[AuthProvider] onAuthStateChange: done → setLoading(false)');
         setLoading(false);
       }
     });

@@ -58,6 +58,7 @@ export default function AuthScreen({
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps='handled'
       enableOnAndroid
+      alwaysBounceVertical={false}
       showsVerticalScrollIndicator={false}>
       
       <View style={styles.inner}>
