@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import Header from './Header';
 import { useAuth } from '../../providers/auth.provider';
 import { Redirect } from 'expo-router';
+import { HeaderRestaurantProvider } from '../../providers/header-restaurant.provider';
 
 type LayoutProps = {
   readonly children: React.ReactNode;
@@ -15,10 +16,12 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <View style={styles.layout}>
-      <Header />
-      {children}
-    </View>
+    <HeaderRestaurantProvider>
+      <View style={styles.layout}>
+        <Header />
+        {children}
+      </View>
+    </HeaderRestaurantProvider>
   );
 }
 
