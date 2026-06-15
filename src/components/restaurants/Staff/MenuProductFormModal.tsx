@@ -1,24 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import BottomSheetModal from '../../shared/BottomSheetModal';
-import ModalHeader from '../../shared/ModalHeader';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Category, CreateProductPayload, ImageFile, Product } from '../../../types/types';
 import { pickImage } from '../../../utils/image';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
-import { ICON_SIZES } from '../../../constants/icon_sizes';
+import BottomSheetModal from '../../shared/BottomSheetModal';
+import FormField from '../../shared/FormField';
+import ImagePickerField from '../../shared/ImagePickerField';
+import ModalHeader from '../../shared/ModalHeader';
 
 const MenuProductFormModal = ({
   visible,
@@ -114,103 +105,95 @@ const MenuProductFormModal = ({
       animationType='slide'
       maxHeight='92%'
       sheetStyle={styles.sheetOverride}>
-          <View style={styles.handle} />
+      <View style={styles.handle} />
 
-          <ModalHeader
-            title={isEditing ? 'Editar producto' : 'Nuevo producto'}
-            onClose={handleClose}
+      <ModalHeader
+        title={isEditing ? 'Editar producto' : 'Nuevo producto'}
+        onClose={handleClose}
+        disabled={submitting}
+        style={styles.headerOverride}
+        titleStyle={styles.titleOverride}
+        closeButtonStyle={styles.closeButtonOverride}
+      />
+
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.form}
+        keyboardShouldPersistTaps='handled'
+        enableOnAndroid
+        extraScrollHeight={80}
+        showsVerticalScrollIndicator={false}>
+        <FormField label='Imagen'>
+          <ImagePickerField
+            previewUrl={previewUrl}
+            onPick={handlePickImage}
             disabled={submitting}
-            style={styles.headerOverride}
-            titleStyle={styles.titleOverride}
-            closeButtonStyle={styles.closeButtonOverride}
+            previewBoxBackground={COLORS.surface.fondo_crema}
+            imageButtonBackground={COLORS.surface.fondo_crema}
           />
+        </FormField>
 
-          <KeyboardAwareScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps='handled' enableOnAndroid extraScrollHeight={80} showsVerticalScrollIndicator={false}>
-              <View style={styles.field}>
-                <Text style={styles.label}>Imagen</Text>
-                <Pressable style={styles.previewBox} onPress={handlePickImage} disabled={submitting}>
-                  {previewUrl ? (
-                    <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode='cover' />
-                  ) : (
-                    <>
-                      <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
-                      <Text style={styles.previewText}>Vista previa</Text>
-                    </>
-                  )}
+        <FormField label='Nombre *'>
+          <TextInput
+            style={styles.input}
+            placeholder='Ej: Burger de res'
+            placeholderTextColor={COLORS.common.gris_medio}
+            value={name}
+            onChangeText={setName}
+            editable={!submitting}
+          />
+        </FormField>
+
+        <FormField label='Descripción'>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder='Descripción breve del plato'
+            placeholderTextColor={COLORS.common.gris_medio}
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={4}
+            textAlignVertical='top'
+            editable={!submitting}
+          />
+        </FormField>
+
+        <FormField label='Categoría *'>
+          <View style={styles.categoryGrid}>
+            {categories.map((category) => {
+              const selected = category.id === categoryId;
+              return (
+                <Pressable
+                  key={category.id}
+                  style={[styles.categoryChip, selected && styles.categoryChipSelected]}
+                  onPress={() => setCategoryId(category.id)}
+                  disabled={submitting}>
+                  <Text style={[styles.categoryChipText, selected && styles.categoryChipTextSelected]}>{category.name}</Text>
                 </Pressable>
-                <Pressable style={styles.imageButton} onPress={handlePickImage} disabled={submitting}>
-                  <Ionicons name='image-outline' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
-                  <Text style={styles.imageButtonText}>{previewUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}</Text>
-                </Pressable>
-              </View>
+              );
+            })}
+          </View>
+        </FormField>
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Nombre *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder='Ej: Burger de res'
-                  placeholderTextColor={COLORS.common.gris_medio}
-                  value={name}
-                  onChangeText={setName}
-                  editable={!submitting}
-                />
-              </View>
+        <FormField label='Precio (ARS) *'>
+          <TextInput
+            style={styles.input}
+            placeholder='1500'
+            placeholderTextColor={COLORS.common.gris_medio}
+            value={price}
+            onChangeText={setPrice}
+            editable={!submitting}
+            keyboardType='decimal-pad'
+          />
+        </FormField>
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Descripción</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder='Descripción breve del plato'
-                  placeholderTextColor={COLORS.common.gris_medio}
-                  value={description}
-                  onChangeText={setDescription}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical='top'
-                  editable={!submitting}
-                />
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Categoría *</Text>
-                <View style={styles.categoryGrid}>
-                  {categories.map((category) => {
-                    const selected = category.id === categoryId;
-
-                    return (
-                      <Pressable
-                        key={category.id}
-                        style={[styles.categoryChip, selected && styles.categoryChipSelected]}
-                        onPress={() => setCategoryId(category.id)}
-                        disabled={submitting}>
-                        <Text style={[styles.categoryChipText, selected && styles.categoryChipTextSelected]}>{category.name}</Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Precio (ARS) *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder='1500'
-                  placeholderTextColor={COLORS.common.gris_medio}
-                  value={price}
-                  onChangeText={setPrice}
-                  editable={!submitting}
-                  keyboardType='decimal-pad'
-                />
-              </View>
-
-              <Pressable style={styles.submitButton} onPress={handleSubmit} disabled={submitting}>
-                {submitting ? (
-                  <ActivityIndicator color={COLORS.common.blanco} />
-                ) : (
-                  <Text style={styles.submitButtonText}>{isEditing ? 'Guardar cambios' : 'Agregar producto'}</Text>
-                )}
-              </Pressable>
-          </KeyboardAwareScrollView>
+        <Pressable style={styles.submitButton} onPress={handleSubmit} disabled={submitting}>
+          {submitting ? (
+            <ActivityIndicator color={COLORS.common.blanco} />
+          ) : (
+            <Text style={styles.submitButtonText}>{isEditing ? 'Guardar cambios' : 'Agregar producto'}</Text>
+          )}
+        </Pressable>
+      </KeyboardAwareScrollView>
     </BottomSheetModal>
   );
 };
@@ -247,14 +230,6 @@ const styles = StyleSheet.create({
     gap: SPACING.medium,
     paddingBottom: SPACING.small,
   },
-  field: {
-    gap: SPACING.small,
-  },
-  label: {
-    color: COLORS.common.gris_oscuro,
-    fontWeight: '700',
-    fontSize: FONT_SIZES.text_base,
-  },
   input: {
     borderWidth: 1,
     borderColor: COLORS.surface.borde_calido,
@@ -268,41 +243,6 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     paddingTop: SPACING.medium,
-  },
-  previewBox: {
-    minHeight: 140,
-    borderRadius: BORDER_RADIUS.medium,
-    backgroundColor: COLORS.surface.fondo_crema,
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    gap: SPACING.small,
-  },
-  previewImage: {
-    width: '100%',
-    height: 180,
-  },
-  previewText: {
-    color: COLORS.common.gris_medio,
-    fontSize: FONT_SIZES.text_base,
-  },
-  imageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.small,
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.medium,
-    borderWidth: 1,
-    borderColor: COLORS.primary.terracota,
-    backgroundColor: COLORS.surface.fondo_crema,
-  },
-  imageButtonText: {
-    color: COLORS.primary.terracota,
-    fontWeight: '700',
-    fontSize: FONT_SIZES.text_base,
   },
   categoryGrid: {
     flexDirection: 'row',

@@ -1,23 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { ImageFile, Restaurant } from '../../../types/types';
 import { restaurantService } from '../../../services/restaurant.service';
 import { pickImage } from '../../../utils/image';
 import { COLORS } from '../../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
-import { ICON_SIZES } from '../../../constants/icon_sizes';
+import { formInputStyle } from '../../../constants/sharedInputStyles';
+import FormField from '../../shared/FormField';
+import ImagePickerField from '../../shared/ImagePickerField';
 
 const RestaurantEditScreen = ({
   restaurantId,
@@ -86,78 +78,63 @@ const RestaurantEditScreen = ({
       keyboardShouldPersistTaps='handled'
       enableOnAndroid
       extraScrollHeight={80}
-      showsVerticalScrollIndicator={false}
-    >
-        <View style={styles.field}>
-          <Text style={styles.label}>Nombre</Text>
-          <TextInput
-            style={styles.input}
-            placeholder='Nombre del restaurante'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={name}
-            onChangeText={setName}
-            editable={!submitting}
-          />
-        </View>
+      showsVerticalScrollIndicator={false}>
+      <FormField label='Nombre'>
+        <TextInput
+          style={styles.input}
+          placeholder='Nombre del restaurante'
+          placeholderTextColor={COLORS.common.gris_medio}
+          value={name}
+          onChangeText={setName}
+          editable={!submitting}
+        />
+      </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Descripción</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder='Descripción del restaurante'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            textAlignVertical='top'
-            editable={!submitting}
-          />
-        </View>
+      <FormField label='Descripción'>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder='Descripción del restaurante'
+          placeholderTextColor={COLORS.common.gris_medio}
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          numberOfLines={4}
+          textAlignVertical='top'
+          editable={!submitting}
+        />
+      </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Ubicación</Text>
-          <TextInput
-            style={styles.input}
-            placeholder='Barrio, Ciudad'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={address}
-            onChangeText={setAddress}
-            editable={!submitting}
-          />
-        </View>
+      <FormField label='Ubicación'>
+        <TextInput
+          style={styles.input}
+          placeholder='Barrio, Ciudad'
+          placeholderTextColor={COLORS.common.gris_medio}
+          value={address}
+          onChangeText={setAddress}
+          editable={!submitting}
+        />
+      </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Imagen</Text>
-          <Pressable style={styles.previewBox} onPress={handlePickImage} disabled={submitting}>
-            {previewUrl ? (
-              <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode='cover' />
-            ) : (
-              <>
-                <Ionicons name='image-outline' size={ICON_SIZES.large} color={COLORS.surface.borde_calido} />
-                <Text style={styles.previewText}>Vista previa</Text>
-              </>
-            )}
-          </Pressable>
-          <Pressable style={styles.imageButton} onPress={handlePickImage} disabled={submitting}>
-            <Ionicons name='image-outline' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
-            <Text style={styles.imageButtonText}>{previewUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}</Text>
-          </Pressable>
-        </View>
-
-        <Pressable
-          style={[styles.saveButton, submitting && styles.saveButtonDisabled]}
-          onPress={handleSave}
+      <FormField label='Imagen'>
+        <ImagePickerField
+          previewUrl={previewUrl}
+          onPick={handlePickImage}
           disabled={submitting}
-          accessibilityRole='button'
-          accessibilityLabel='Guardar cambios'
-        >
-          {submitting ? (
-            <ActivityIndicator color={COLORS.common.blanco} />
-          ) : (
-            <Text style={styles.saveButtonText}>Guardar cambios</Text>
-          )}
-        </Pressable>
+        />
+      </FormField>
+
+      <Pressable
+        style={[styles.saveButton, submitting && styles.saveButtonDisabled]}
+        onPress={handleSave}
+        disabled={submitting}
+        accessibilityRole='button'
+        accessibilityLabel='Guardar cambios'>
+        {submitting ? (
+          <ActivityIndicator color={COLORS.common.blanco} />
+        ) : (
+          <Text style={styles.saveButtonText}>Guardar cambios</Text>
+        )}
+      </Pressable>
     </KeyboardAwareScrollView>
   );
 };
@@ -171,62 +148,10 @@ const styles = StyleSheet.create({
     padding: SPACING.large,
     paddingBottom: SPACING.extra_large,
   },
-  field: {
-    gap: SPACING.small,
-  },
-  label: {
-    fontSize: FONT_SIZES.text_base,
-    fontWeight: '700',
-    color: COLORS.common.gris_oscuro,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-    borderRadius: BORDER_RADIUS.medium,
-    backgroundColor: COLORS.common.blanco,
-    paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.medium,
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.negro_principal,
-  },
+  input: formInputStyle,
   textArea: {
     minHeight: 100,
     paddingTop: SPACING.medium,
-  },
-  previewBox: {
-    minHeight: 140,
-    borderRadius: BORDER_RADIUS.medium,
-    backgroundColor: COLORS.common.blanco,
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    gap: SPACING.small,
-  },
-  previewImage: {
-    width: '100%',
-    height: 180,
-  },
-  previewText: {
-    color: COLORS.common.gris_medio,
-    fontSize: FONT_SIZES.text_base,
-  },
-  imageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.small,
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.medium,
-    borderWidth: 1,
-    borderColor: COLORS.primary.terracota,
-    backgroundColor: COLORS.common.blanco,
-  },
-  imageButtonText: {
-    color: COLORS.primary.terracota,
-    fontWeight: '700',
-    fontSize: FONT_SIZES.text_base,
   },
   saveButton: {
     alignItems: 'center',
