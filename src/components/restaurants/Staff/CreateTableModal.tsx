@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Alert, StyleSheet, Text, TextInput } from 'react-native';
 import { COLORS } from '../../../constants/colors';
-import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { modalInputStyle } from '../../../constants/sharedInputStyles';
 import { CreateTablePayload } from '../../../types/types';
+import CenterModal from '../../shared/CenterModal';
+import ModalActionButtons from '../../shared/ModalActionButtons';
 
 const CreateTableModal = ({
   visible,
@@ -65,116 +66,51 @@ const CreateTableModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType='fade' onRequestClose={handleClose}>
-      <View style={styles.overlay}>
-        <KeyboardAwareScrollView
-          style={styles.sheetWrapper}
-          contentContainerStyle={styles.sheet}
-          keyboardShouldPersistTaps='handled'
-          enableOnAndroid
-          extraScrollHeight={80}
-          showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Nueva mesa</Text>
+    <CenterModal visible={visible} onClose={handleClose}>
+      <Text style={styles.title}>Nueva mesa</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder='Código (ej: 1A)'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={code}
-            onChangeText={setCode}
-            autoCapitalize='characters'
-          />
-          <TextInput
-            style={styles.input}
-            placeholder='Área (opcional)'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={area}
-            onChangeText={setArea}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder='Capacidad (personas)'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={capacity}
-            onChangeText={setCapacity}
-            keyboardType='number-pad'
-          />
+      <TextInput
+        style={styles.input}
+        placeholder='Código (ej: 1A)'
+        placeholderTextColor={COLORS.common.gris_medio}
+        value={code}
+        onChangeText={setCode}
+        autoCapitalize='characters'
+      />
+      <TextInput
+        style={styles.input}
+        placeholder='Área (opcional)'
+        placeholderTextColor={COLORS.common.gris_medio}
+        value={area}
+        onChangeText={setArea}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder='Capacidad (personas)'
+        placeholderTextColor={COLORS.common.gris_medio}
+        value={capacity}
+        onChangeText={setCapacity}
+        keyboardType='number-pad'
+      />
 
-          <View style={styles.actionsRow}>
-            <Pressable style={styles.cancelButton} onPress={handleClose} disabled={submitting}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </Pressable>
-            <Pressable style={styles.createButton} onPress={handleSubmit} disabled={submitting}>
-              {submitting ? <ActivityIndicator color={COLORS.common.blanco} /> : <Text style={styles.createButtonText}>Crear mesa</Text>}
-            </Pressable>
-          </View>
-        </KeyboardAwareScrollView>
-      </View>
-    </Modal>
+      <ModalActionButtons
+        onCancel={handleClose}
+        onConfirm={handleSubmit}
+        confirmLabel='Crear mesa'
+        disabled={submitting}
+        loading={submitting}
+      />
+    </CenterModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.large,
-  },
-  sheetWrapper: {
-    width: '100%',
-    backgroundColor: COLORS.common.blanco,
-    borderRadius: BORDER_RADIUS.medium,
-    overflow: 'hidden',
-  },
-  sheet: {
-    padding: SPACING.large,
-    gap: SPACING.medium,
-  },
   title: {
     fontSize: FONT_SIZES.title_small,
     fontWeight: '800',
     color: COLORS.common.negro_principal,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-    borderRadius: BORDER_RADIUS.small,
-    backgroundColor: COLORS.surface.fondo_crema,
-    paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.medium,
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.negro_principal,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: SPACING.small,
-  },
-  cancelButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.extra_large,
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-  },
-  cancelButtonText: {
-    color: COLORS.common.gris_oscuro,
-    fontWeight: '700',
-  },
-  createButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: COLORS.primary.terracota,
-  },
-  createButtonText: {
-    color: COLORS.common.blanco,
-    fontWeight: '700',
-  },
+  input: modalInputStyle,
 });
 
 export default CreateTableModal;

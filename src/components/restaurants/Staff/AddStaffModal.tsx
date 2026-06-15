@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ApiError } from '../../../lib/apiClient';
 import { COLORS } from '../../../constants/colors';
-import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
+import { SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { modalInputStyle } from '../../../constants/sharedInputStyles';
 import { CreateStaffPayload, RestaurantStaffEnum } from '../../../types/types';
 import { getAssignableRoles } from '../../../utils/staffPermissions';
+import CenterModal from '../../shared/CenterModal';
+import ModalActionButtons from '../../shared/ModalActionButtons';
 import RolePicker from '../../shared/RolePicker';
 
 const AddStaffModal = ({
@@ -77,96 +79,55 @@ const AddStaffModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType='fade' onRequestClose={handleClose}>
-      <View style={styles.overlay}>
-        <KeyboardAwareScrollView
-          style={styles.sheetWrapper}
-          contentContainerStyle={styles.sheet}
-          keyboardShouldPersistTaps='handled'
-          enableOnAndroid
-          extraScrollHeight={80}
-          showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Agregar personal</Text>
+    <CenterModal visible={visible} onClose={handleClose}>
+      <Text style={styles.title}>Agregar personal</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder='Email'
-            placeholderTextColor={COLORS.common.gris_medio}
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setInlineError(null);
-            }}
-            keyboardType='email-address'
-            autoCapitalize='none'
-            autoCorrect={false}
-          />
+      <TextInput
+        style={styles.input}
+        placeholder='Email'
+        placeholderTextColor={COLORS.common.gris_medio}
+        value={email}
+        onChangeText={(text) => {
+          setEmail(text);
+          setInlineError(null);
+        }}
+        keyboardType='email-address'
+        autoCapitalize='none'
+        autoCorrect={false}
+      />
 
-          <View style={styles.roleSection}>
-            <Text style={styles.roleLabel}>Rol</Text>
-            <RolePicker
-              roles={assignableRoles}
-              selectedRole={selectedRole}
-              onSelect={(role) => {
-                setSelectedRole(role);
-                setInlineError(null);
-              }}
-            />
-          </View>
-
-          {inlineError ? <Text style={styles.inlineError}>{inlineError}</Text> : null}
-
-          <View style={styles.actionsRow}>
-            <Pressable style={styles.cancelButton} onPress={handleClose} disabled={submitting}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </Pressable>
-            <Pressable style={styles.createButton} onPress={handleSubmit} disabled={submitting}>
-              {submitting ? (
-                <ActivityIndicator color={COLORS.common.blanco} />
-              ) : (
-                <Text style={styles.createButtonText}>Agregar</Text>
-              )}
-            </Pressable>
-          </View>
-        </KeyboardAwareScrollView>
+      <View style={styles.roleSection}>
+        <Text style={styles.roleLabel}>Rol</Text>
+        <RolePicker
+          roles={assignableRoles}
+          selectedRole={selectedRole}
+          onSelect={(role) => {
+            setSelectedRole(role);
+            setInlineError(null);
+          }}
+        />
       </View>
-    </Modal>
+
+      {inlineError ? <Text style={styles.inlineError}>{inlineError}</Text> : null}
+
+      <ModalActionButtons
+        onCancel={handleClose}
+        onConfirm={handleSubmit}
+        confirmLabel='Agregar'
+        disabled={submitting}
+        loading={submitting}
+      />
+    </CenterModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.large,
-  },
-  sheetWrapper: {
-    width: '100%',
-    backgroundColor: COLORS.common.blanco,
-    borderRadius: BORDER_RADIUS.medium,
-    overflow: 'hidden',
-  },
-  sheet: {
-    padding: SPACING.large,
-    gap: SPACING.medium,
-  },
   title: {
     fontSize: FONT_SIZES.title_small,
     fontWeight: '800',
     color: COLORS.common.negro_principal,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-    borderRadius: BORDER_RADIUS.small,
-    backgroundColor: COLORS.surface.fondo_crema,
-    paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.medium,
-    fontSize: FONT_SIZES.text_base,
-    color: COLORS.common.negro_principal,
-  },
+  input: modalInputStyle,
   roleSection: {
     gap: SPACING.small,
   },
@@ -178,34 +139,6 @@ const styles = StyleSheet.create({
   inlineError: {
     fontSize: FONT_SIZES.text_small,
     color: COLORS.status.error,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: SPACING.small,
-  },
-  cancelButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.extra_large,
-    borderWidth: 1,
-    borderColor: COLORS.surface.borde_calido,
-  },
-  cancelButtonText: {
-    color: COLORS.common.gris_oscuro,
-    fontWeight: '700',
-  },
-  createButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.medium,
-    borderRadius: BORDER_RADIUS.extra_large,
-    backgroundColor: COLORS.primary.terracota,
-  },
-  createButtonText: {
-    color: COLORS.common.blanco,
-    fontWeight: '700',
   },
 });
 
