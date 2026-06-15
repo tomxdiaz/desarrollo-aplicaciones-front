@@ -4,7 +4,11 @@ import { useAuth } from '../../providers/auth.provider';
 import { HeaderRestaurantProvider } from '../../providers/header-restaurant.provider';
 import { Redirect } from 'expo-router';
 
-export default function Layout1({ children }: { children: React.ReactNode }) {
+type Layout1Props = {
+  readonly children: React.ReactNode;
+};
+
+export default function Layout1({ children }: Layout1Props) {
   const { session, loading } = useAuth();
 
   if (!session && !loading) {

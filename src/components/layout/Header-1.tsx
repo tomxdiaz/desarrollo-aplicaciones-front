@@ -1,4 +1,3 @@
-import * as SplashScreen from 'expo-splash-screen';
 import { Image, StyleSheet, View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing_and_borders';

@@ -8,50 +8,52 @@ import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { formatPrice } from '../../../utils/menu';
 import CartStepper from '../../shared/CartStepper';
 
-type MenuProductCardProps = {
+type MenuProductCardProps = Readonly<{
   product: Product;
   hasTable: boolean;
   quantity: number;
   onAdd: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
-};
+}>;
 
 const PLACEHOLDER_IMAGE = require('../../../../assets/images/restaurant.jpg');
 
-const MenuProductCard = ({
-  product,
-  hasTable,
-  quantity,
-  onAdd,
-  onIncrement,
-  onDecrement,
-}: MenuProductCardProps) => {
+const MenuProductCard = ({ product, hasTable, quantity, onAdd, onIncrement, onDecrement }: MenuProductCardProps) => {
   const imageSource = product.image ? { uri: product.image } : PLACEHOLDER_IMAGE;
+
+  let cartControl = null;
+
+  if (hasTable) {
+    cartControl =
+      quantity === 0 ? (
+        <Pressable style={styles.addButton} onPress={onAdd}>
+          <AntDesign name='plus' size={ICON_SIZES.extra_small} color={COLORS.primary.terracota} />
+        </Pressable>
+      ) : (
+        <CartStepper quantity={quantity} onIncrement={onIncrement} onDecrement={onDecrement} />
+      );
+  }
 
   return (
     <View style={styles.card}>
       <Image source={imageSource} style={styles.image} />
+
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={1}>
           {product.name}
         </Text>
+
         {product.description ? (
           <Text style={styles.description} numberOfLines={2}>
             {product.description}
           </Text>
         ) : null}
+
         <Text style={styles.price}>{formatPrice(product.price)}</Text>
       </View>
-      {hasTable ? (
-        quantity === 0 ? (
-          <Pressable style={styles.addButton} onPress={onAdd}>
-            <AntDesign name='plus' size={ICON_SIZES.extra_small} color={COLORS.primary.terracota} />
-          </Pressable>
-        ) : (
-          <CartStepper quantity={quantity} onIncrement={onIncrement} onDecrement={onDecrement} />
-        )
-      ) : null}
+
+      {cartControl}
     </View>
   );
 };

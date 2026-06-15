@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -40,7 +40,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const { setRestaurantName } = useHeaderRestaurant();
 
-  const TABLE_CODE_REGEX = /^[A-Za-z0-9 _\-]+$/;
+  const TABLE_CODE_REGEX = /^[A-Za-z0-9 _-]+$/;
 
   const goToMenu = (rawCode: string) => {
     const parsed = parseTableCode(rawCode);
@@ -50,9 +50,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
       return;
     }
 
-    const tableExists = restaurant?.tables?.some(
-      (t) => t.code.toUpperCase() === parsed.tableCode.toUpperCase(),
-    );
+    const tableExists = restaurant?.tables?.some((t) => t.code.toUpperCase() === parsed.tableCode.toUpperCase());
 
     if (!tableExists) {
       Alert.alert('Mesa no encontrada', 'Esa mesa no existe en este restaurante.');
@@ -73,9 +71,7 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
       return;
     }
 
-    const tableExists = restaurant?.tables?.some(
-      (t) => t.code.toUpperCase() === code.toUpperCase(),
-    );
+    const tableExists = restaurant?.tables?.some((t) => t.code.toUpperCase() === code.toUpperCase());
 
     if (!tableExists) {
       setTableError('Esa mesa no existe en este restaurante.');
@@ -215,16 +211,17 @@ const RestaurantDetailScreen = ({ id }: { id: string }) => {
               placeholder={tableInputFocused ? undefined : 'CÓDIGO DE MESA (1A, 2B...)'}
               placeholderTextColor={COLORS.common.gris_medio}
               value={tableInput}
-              onChangeText={(text) => { setTableInput(text); setTableError(null); }}
+              onChangeText={(text) => {
+                setTableInput(text);
+                setTableError(null);
+              }}
               onFocus={() => setTableInputFocused(true)}
               onBlur={() => setTableInputFocused(false)}
               autoCapitalize='characters'
               keyboardType='email-address'
             />
 
-            {tableError ? (
-              <Text style={styles.tableErrorText}>{tableError}</Text>
-            ) : null}
+            {tableError ? <Text style={styles.tableErrorText}>{tableError}</Text> : null}
 
             {tableInput.trim().length > 0 ? (
               <Pressable style={styles.menuButton} onPress={handleGoToMenuManual}>

@@ -19,16 +19,23 @@ import RestaurantStaffScreen from '../Staff/RestaurantStaffScreen';
 import RestaurantMenuManagementScreen from '../Staff/RestaurantMenuManagementScreen';
 import RestaurantEditScreen from '../Staff/RestaurantEditScreen';
 
-const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
+type MyRestaurantDetailScreenProps = Readonly<{
+  id: string;
+}>;
+
+const MyRestaurantDetailScreen = ({ id }: MyRestaurantDetailScreenProps) => {
   const { appUser } = useAuth();
+  const { setRestaurantName } = useHeaderRestaurant();
+
   const [loading, setLoading] = useState(true);
   const [myRestaurant, setMyRestaurant] = useState<Restaurant | null>(null);
   const [myRestaurantStaffInfo, setMyRestaurantStaffInfo] = useState<RestaurantStaff | null>(null);
   const [activeTab, setActiveTab] = useState<StaffTabKey>('orders');
   const [openOrderForTable, setOpenOrderForTable] = useState<number | null>(null);
-  const { setRestaurantName } = useHeaderRestaurant();
 
   const loadData = useCallback(async () => {
+    setLoading(true);
+
     let restaurant: Restaurant;
 
     try {
@@ -37,11 +44,12 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     } catch (error) {
       console.error('Error fetching restaurant:', error);
       setMyRestaurant(null);
+      setMyRestaurantStaffInfo(null);
       setLoading(false);
       return;
     }
 
-    const isRestaurantOwner = Boolean(appUser && appUser.id === restaurant.owner_id);
+    const isRestaurantOwner = appUser?.id === restaurant.owner_id;
     const isSuperUser = appUser?.global_role === AppRoleEnum.SUPER_USER;
 
     if (isRestaurantOwner || isSuperUser) {
@@ -52,6 +60,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
 
     try {
       const staffInfo = await restaurantStaffService.getMyRestaurantStaffInfo(id);
+
       setMyRestaurantStaffInfo(staffInfo);
     } catch (error) {
       console.error('Error fetching restaurant staff info:', error);
@@ -63,13 +72,16 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
+      void loadData();
     }, [loadData]),
   );
 
   useEffect(() => {
     setRestaurantName(myRestaurant?.name ?? null);
-    return () => setRestaurantName(null);
+
+    return () => {
+      setRestaurantName(null);
+    };
   }, [myRestaurant?.name, setRestaurantName]);
 
   const refreshRestaurant = useCallback(async () => {
@@ -90,7 +102,9 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     setActiveTab('orders');
   };
 
-  const handleOrderOpened = useCallback(() => setOpenOrderForTable(null), []);
+  const handleOrderOpened = useCallback(() => {
+    setOpenOrderForTable(null);
+  }, []);
 
   if (loading) {
     return (
@@ -108,10 +122,10 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
     );
   }
 
-  const isRestaurantOwner = Boolean(appUser && appUser.id === myRestaurant.owner_id);
+  const isRestaurantOwner = appUser?.id === myRestaurant.owner_id;
   const isSuperUser = appUser?.global_role === AppRoleEnum.SUPER_USER;
-  const effectiveStaffRole =
-    myRestaurantStaffInfo?.role ?? (isRestaurantOwner || isSuperUser ? RestaurantStaffEnum.OWNER : null);
+
+  const effectiveStaffRole = myRestaurantStaffInfo?.role ?? (isRestaurantOwner || isSuperUser ? RestaurantStaffEnum.OWNER : null);
 
   if (!effectiveStaffRole) {
     return (
@@ -122,22 +136,25 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
   }
 
   const visibleTabs: StaffTab[] = STAFF_TABS.filter((tab) => {
-    if (tab.key === 'edit') return canEditRestaurant(effectiveStaffRole);
-    if (tab.key === 'menu') return canManageMenu(effectiveStaffRole);
-    if (tab.key === 'staff') return canManageStaff(effectiveStaffRole);
+    if (tab.key === 'edit') {
+      return canEditRestaurant(effectiveStaffRole);
+    }
+
+    if (tab.key === 'menu') {
+      return canManageMenu(effectiveStaffRole);
+    }
+
+    if (tab.key === 'staff') {
+      return canManageStaff(effectiveStaffRole);
+    }
+
     return true;
   });
-  
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'edit':
-        return (
-          <RestaurantEditScreen
-            restaurantId={id}
-            restaurant={myRestaurant}
-            onRefresh={refreshRestaurant}
-          />
-        );
+        return <RestaurantEditScreen restaurantId={id} restaurant={myRestaurant} onRefresh={refreshRestaurant} />;
 
       case 'orders':
         return (
@@ -148,7 +165,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
             onOrderOpened={handleOrderOpened}
           />
         );
-  
+
       case 'tables':
         return (
           <RestaurantTablesScreen
@@ -160,7 +177,7 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
             onViewOrdersForTable={handleViewOrdersForTable}
           />
         );
-  
+
       case 'menu':
         return (
           <RestaurantMenuManagementScreen
@@ -170,8 +187,16 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
             onRefresh={refreshRestaurant}
           />
         );
-  
+
       case 'staff': {
+        if (!appUser && !myRestaurantStaffInfo) {
+          return (
+            <View style={styles.centered}>
+              <Text style={styles.message}>No se pudo obtener la información del usuario</Text>
+            </View>
+          );
+        }
+
         const staffInfo: RestaurantStaff = myRestaurantStaffInfo ?? {
           id: 0,
           user_id: appUser!.id,
@@ -179,16 +204,15 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
           role: RestaurantStaffEnum.OWNER,
           app_user: appUser!,
         };
-        return (
-          <RestaurantStaffScreen
-            restaurantId={id}
-            currentUserStaffInfo={staffInfo}
-          />
-        );
+
+        return <RestaurantStaffScreen restaurantId={id} currentUserStaffInfo={staffInfo} />;
       }
+
+      default:
+        return null;
     }
   };
-  
+
   return (
     <View style={styles.screen}>
       {myRestaurant.image ? (
@@ -202,17 +226,12 @@ const MyRestaurantDetailScreen = ({ id }: { id: string }) => {
       <View style={styles.header}>
         <Text style={styles.restaurantName}>{myRestaurant.name}</Text>
       </View>
-  
-      <StaffTabs
-        tabs={visibleTabs}
-        activeTab={activeTab}
-        onSelect={setActiveTab}
-      />
-  
+
+      <StaffTabs tabs={visibleTabs} activeTab={activeTab} onSelect={setActiveTab} />
+
       {renderActiveTab()}
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({

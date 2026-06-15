@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, ScrollView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../providers/auth.provider';
-import { AntDesign, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { COLORS } from '../../constants/colors';
 import { FONT_SIZES } from '../../constants/font_sizes';
@@ -12,8 +12,8 @@ import { isRole } from '../../utils/role';
 import { AppRoleEnum } from '../../types/types';
 
 type DrawerProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 };
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {

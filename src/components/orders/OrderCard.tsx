@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
@@ -6,13 +6,7 @@ import { router } from 'expo-router';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../types/restaurant-order-status';
 import { Order } from '../../types/order.types';
 
-const OrderCard = ({
-  order,
-  onCancel,
-}: {
-  order: Order;
-  onCancel?: (order: Order) => void;
-}) => {
+const OrderCard = ({ order, onCancel }: { order: Order; onCancel?: (order: Order) => void }) => {
   const handlePress = () => {
     router.push(`/my-orders/${order.id}?restaurantId=${order.restaurant_id}`);
   };

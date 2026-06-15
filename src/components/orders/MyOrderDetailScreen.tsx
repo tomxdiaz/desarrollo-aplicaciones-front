@@ -77,7 +77,7 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
   }, [order?.created_at]);
 
   const handleCancelOrder = async () => {
-    if (!order || order.status !== 'PENDING' || cancelling) {
+    if (order?.status !== 'PENDING' || cancelling) {
       return;
     }
 
@@ -125,7 +125,10 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
       </View>
 
       {order.status === 'PENDING' && (
-        <Pressable style={[styles.cancelButton, cancelling && styles.cancelButtonDisabled]} onPress={handleCancelOrder} disabled={cancelling}>
+        <Pressable
+          style={[styles.cancelButton, cancelling && styles.cancelButtonDisabled]}
+          onPress={handleCancelOrder}
+          disabled={cancelling}>
           <Text style={styles.cancelButtonText}>{cancelling ? 'Cancelando...' : 'Cancelar pedido'}</Text>
         </Pressable>
       )}

@@ -25,7 +25,7 @@ const ConfirmOrderScreen = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  if (!session || !session.tableCode) {
+  if (!session?.tableCode) {
     router.replace('/');
     return null;
   }
@@ -99,14 +99,9 @@ const ConfirmOrderScreen = () => {
               <Pressable
                 key={option.value}
                 style={[styles.paymentOption, isSelected && styles.paymentOptionSelected]}
-                onPress={() => setPaymentMethod(option.value)}
-              >
-                <Text style={[styles.paymentLabel, isSelected && styles.paymentLabelSelected]}>
-                  {option.label}
-                </Text>
-                {isSelected ? (
-                  <AntDesign name='check-circle' size={ICON_SIZES.small} color={COLORS.primary.terracota} />
-                ) : null}
+                onPress={() => setPaymentMethod(option.value)}>
+                <Text style={[styles.paymentLabel, isSelected && styles.paymentLabelSelected]}>{option.label}</Text>
+                {isSelected ? <AntDesign name='check-circle' size={ICON_SIZES.small} color={COLORS.primary.terracota} /> : null}
               </Pressable>
             );
           })}
@@ -116,16 +111,8 @@ const ConfirmOrderScreen = () => {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable
-          style={[styles.confirmButton, loading && styles.confirmButtonDisabled]}
-          onPress={handleConfirm}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={COLORS.common.blanco} />
-          ) : (
-            <Text style={styles.confirmText}>Confirmar Pedido</Text>
-          )}
+        <Pressable style={[styles.confirmButton, loading && styles.confirmButtonDisabled]} onPress={handleConfirm} disabled={loading}>
+          {loading ? <ActivityIndicator color={COLORS.common.blanco} /> : <Text style={styles.confirmText}>Confirmar Pedido</Text>}
         </Pressable>
       </View>
     </View>

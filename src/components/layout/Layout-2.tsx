@@ -3,7 +3,11 @@ import { Redirect } from 'expo-router';
 import { useAuth } from '../../providers/auth.provider';
 import Header2 from './Header-2';
 
-export default function Layout2({ children }: { children: React.ReactNode }) {
+type Layout2Props = {
+  readonly children: React.ReactNode;
+};
+
+export default function Layout2({ children }: Layout2Props) {
   const { appUser, loading } = useAuth();
 
   if (!appUser && !loading) {

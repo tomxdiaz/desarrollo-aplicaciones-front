@@ -34,7 +34,7 @@ const CreateTableModal = ({
 
   const handleSubmit = async () => {
     const trimmedCode = code.trim();
-    const parsedCapacity = parseInt(capacity, 10);
+    const parsedCapacity = Number.parseInt(capacity, 10);
 
     if (!trimmedCode) {
       Alert.alert('Falta el código', 'Ingresá el código de la mesa.');

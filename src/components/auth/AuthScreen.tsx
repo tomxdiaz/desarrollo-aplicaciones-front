@@ -8,6 +8,15 @@ import { FONT_SIZES } from '../../constants/font_sizes';
 import { useAuth } from '../../providers/auth.provider';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
+interface AuthScreenProps {
+  readonly title: string;
+  readonly buttonText: string;
+  readonly handleAuth: (email: string, password: string) => Promise<void>;
+  readonly alternativeActionText: string;
+  readonly alternativeActionLinkText: string;
+  readonly onPressLink: () => void;
+}
+
 export default function AuthScreen({
   title,
   buttonText,
@@ -15,14 +24,7 @@ export default function AuthScreen({
   alternativeActionText,
   alternativeActionLinkText,
   onPressLink,
-}: {
-  title: string;
-  buttonText: string;
-  handleAuth: (email: string, password: string) => Promise<void>;
-  alternativeActionText: string;
-  alternativeActionLinkText: string;
-  onPressLink: () => void;
-}) {
+}: AuthScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -60,7 +62,14 @@ export default function AuthScreen({
           autoCapitalize='none'
         />
 
-        <TextInput style={styles.input} placeholder='**********' placeholderTextColor='#888888' value={password} onChangeText={setPassword} secureTextEntry />
+        <TextInput
+          style={styles.input}
+          placeholder='**********'
+          placeholderTextColor='#888888'
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
         <TouchableOpacity style={styles.button} onPress={() => handleAuth(email, password)}>
           <Text style={styles.buttonText}>{buttonText}</Text>
