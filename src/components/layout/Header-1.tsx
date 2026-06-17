@@ -32,11 +32,9 @@ export default function Header1() {
           <Image style={styles.logo} source={require('../../../assets/logos/logo_outlined.png')} />
           <View style={styles.titleGroup}>
             <Text style={styles.title}>Provecho!</Text>
-            {restaurantName ? (
-              <Text style={styles.subtitle} numberOfLines={1}>
-                {restaurantName}
-              </Text>
-            ) : null}
+            <Text style={styles.subtitle} numberOfLines={1}>
+              {restaurantName ?? 'Del menú a tu mesa'}
+            </Text>
           </View>
         </View>
       </View>
