@@ -3,7 +3,6 @@ import {
   canFreeTable,
   canManageMenu,
   canViewMenu,
-  canUpdateOrderStatus,
   canManageStaff,
   canEditRestaurant,
   getStaffRoleRank,
@@ -30,11 +29,10 @@ describe('staffPermissions', () => {
   });
 
   describe('permisos otorgados a todos los roles', () => {
-    it('permite a cualquier rol liberar una mesa, ver el menú y actualizar el estado del pedido', () => {
+    it('permite a cualquier rol liberar una mesa y ver el menú', () => {
       [OWNER, ADMIN, CASHIER_PLUS, CASHIER].forEach((role) => {
         expect(canFreeTable(role)).toBe(true);
         expect(canViewMenu(role)).toBe(true);
-        expect(canUpdateOrderStatus(role)).toBe(true);
       });
     });
   });

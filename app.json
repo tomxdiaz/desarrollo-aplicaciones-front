@@ -23,7 +23,15 @@
       },
       "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
-      "package": "com.tomxdiaz.desarrolloaplicacionesfront"
+      "package": "com.tomxdiaz.desarrolloaplicacionesfront",
+      "statusBar": {
+        "backgroundColor": "#000000",
+        "barStyle": "light-content"
+      },
+      "navigationBar": {
+        "backgroundColor": "#000000",
+        "barStyle": "light-content"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

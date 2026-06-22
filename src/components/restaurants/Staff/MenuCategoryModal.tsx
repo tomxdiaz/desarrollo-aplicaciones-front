@@ -9,6 +9,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
+
+const NAME_MAX = 40;
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../../constants/colors';
@@ -79,14 +81,18 @@ const MenuCategoryModal = ({
             <Text style={styles.title}>Nueva categoría</Text>
             <Text style={styles.subtitle}>Las categorías organizan el menú por secciones.</Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder='Ej: Entradas, Especialidades, Bebidas'
-              placeholderTextColor={COLORS.common.gris_medio}
-              value={name}
-              onChangeText={setName}
-              editable={!submitting}
-            />
+            <View>
+              <TextInput
+                style={styles.input}
+                placeholder='Ej: Entradas, Especialidades, Bebidas'
+                placeholderTextColor={COLORS.common.gris_medio}
+                value={name}
+                onChangeText={setName}
+                maxLength={NAME_MAX}
+                editable={!submitting}
+              />
+              <Text style={styles.counter}>{name.length}/{NAME_MAX}</Text>
+            </View>
 
             {existingNames.length > 0 ? (
               <View style={styles.tagsBlock}>
@@ -165,6 +171,12 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.medium,
     fontSize: FONT_SIZES.text_base,
     color: COLORS.common.negro_principal,
+  },
+  counter: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_medio,
+    textAlign: 'right',
+    marginTop: SPACING.small,
   },
   tagsBlock: {
     gap: SPACING.small,

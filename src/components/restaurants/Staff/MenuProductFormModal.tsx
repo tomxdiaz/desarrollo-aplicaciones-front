@@ -131,18 +131,19 @@ const MenuProductFormModal = ({
           />
         </FormField>
 
-        <FormField label='Nombre *'>
+        <FormField label='Nombre *' maxLength={40} value={name}>
           <TextInput
             style={styles.input}
             placeholder='Ej: Burger de res'
             placeholderTextColor={COLORS.common.gris_medio}
             value={name}
             onChangeText={setName}
+            maxLength={40}
             editable={!submitting}
           />
         </FormField>
 
-        <FormField label='Descripción'>
+        <FormField label='Descripción' maxLength={200} value={description}>
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder='Descripción breve del plato'
@@ -152,6 +153,7 @@ const MenuProductFormModal = ({
             multiline
             numberOfLines={4}
             textAlignVertical='top'
+            maxLength={200}
             editable={!submitting}
           />
         </FormField>

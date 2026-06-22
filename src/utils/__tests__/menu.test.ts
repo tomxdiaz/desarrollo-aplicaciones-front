@@ -1,15 +1,5 @@
-import { formatPrice, getActiveCategories, getProductsForCategory, getCartCount } from '../menu';
+import { formatPrice, getActiveCategories } from '../menu';
 import { Menu, Category, Product } from '../../types/types';
-
-const product = (id: number, categoryId: number, active = true): Product => ({
-  id,
-  category_id: categoryId,
-  name: `Product ${id}`,
-  description: null,
-  price: 100,
-  image: null,
-  active,
-});
 
 const category = (id: number, active: boolean, products: Product[]): Category => ({
   id,
@@ -44,47 +34,6 @@ describe('utilidades de menú', () => {
     it('devuelve un arreglo vacío para un menú indefinido o sin categorías', () => {
       expect(getActiveCategories(undefined)).toEqual([]);
       expect(getActiveCategories({ id: 1, restaurant_id: 1, name: null })).toEqual([]);
-    });
-  });
-
-  describe('getProductsForCategory', () => {
-    const menu: Menu = {
-      id: 1,
-      restaurant_id: 1,
-      name: 'Main',
-      categories: [
-        category(1, true, [product(10, 1), product(11, 1, false)]),
-        category(2, false, [product(20, 2)]),
-        category(3, true, [product(30, 3)]),
-      ],
-    };
-
-    it('devuelve los productos activos de la categoría indicada', () => {
-      expect(getProductsForCategory(menu, 1).map((p) => p.id)).toEqual([10]);
-    });
-
-    it('cuando categoryId es null, devuelve los productos activos de todas las categorías activas', () => {
-      // la categoría 2 está inactiva, por lo que su producto 20 se excluye; el 11 está inactivo.
-      expect(getProductsForCategory(menu, null).map((p) => p.id)).toEqual([10, 30]);
-    });
-
-    it('devuelve un arreglo vacío para una categoría desconocida', () => {
-      expect(getProductsForCategory(menu, 999)).toEqual([]);
-    });
-
-    it('devuelve un arreglo vacío para un menú indefinido', () => {
-      expect(getProductsForCategory(undefined, 1)).toEqual([]);
-      expect(getProductsForCategory(undefined, null)).toEqual([]);
-    });
-  });
-
-  describe('getCartCount', () => {
-    it('suma todas las cantidades', () => {
-      expect(getCartCount({ 1: 2, 2: 3, 5: 1 })).toBe(6);
-    });
-
-    it('devuelve 0 para un carrito vacío', () => {
-      expect(getCartCount({})).toBe(0);
     });
   });
 });

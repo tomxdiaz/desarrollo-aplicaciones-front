@@ -5,6 +5,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useCart } from '../../providers/cart.provider';
 import { orderService } from '../../services/order.service';
+import { ApiError } from '../../lib/apiClient';
 import { COLORS } from '../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
@@ -47,7 +48,9 @@ const ConfirmOrderScreen = () => {
       router.replace('/(checkout)/success');
     } catch (error) {
       console.error('Error creating order:', error);
-      setErrorMessage('No se pudo enviar el pedido. Intentá de nuevo.');
+      const message =
+        error instanceof ApiError ? error.message : 'No se pudo enviar el pedido. Intentá de nuevo.';
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }

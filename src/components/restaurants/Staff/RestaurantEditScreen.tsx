@@ -79,18 +79,19 @@ const RestaurantEditScreen = ({
       enableOnAndroid
       extraScrollHeight={80}
       showsVerticalScrollIndicator={false}>
-      <FormField label='Nombre'>
+      <FormField label='Nombre' maxLength={40} value={name}>
         <TextInput
           style={styles.input}
           placeholder='Nombre del restaurante'
           placeholderTextColor={COLORS.common.gris_medio}
           value={name}
           onChangeText={setName}
+          maxLength={40}
           editable={!submitting}
         />
       </FormField>
 
-      <FormField label='Descripción'>
+      <FormField label='Descripción' maxLength={200} value={description}>
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder='Descripción del restaurante'
@@ -100,17 +101,19 @@ const RestaurantEditScreen = ({
           multiline
           numberOfLines={4}
           textAlignVertical='top'
+          maxLength={200}
           editable={!submitting}
         />
       </FormField>
 
-      <FormField label='Ubicación'>
+      <FormField label='Ubicación' maxLength={100} value={address}>
         <TextInput
           style={styles.input}
           placeholder='Barrio, Ciudad'
           placeholderTextColor={COLORS.common.gris_medio}
           value={address}
           onChangeText={setAddress}
+          maxLength={100}
           editable={!submitting}
         />
       </FormField>

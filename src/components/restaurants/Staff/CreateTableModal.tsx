@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import { COLORS } from '../../../constants/colors';
 import { FONT_SIZES } from '../../../constants/font_sizes';
+import { SPACING } from '../../../constants/spacing_and_borders';
 import { modalInputStyle } from '../../../constants/sharedInputStyles';
 import { CreateTablePayload } from '../../../types/types';
 import CenterModal from '../../shared/CenterModal';
 import ModalActionButtons from '../../shared/ModalActionButtons';
+
+const CODE_MAX = 4;
+const AREA_MAX = 20;
 
 const CreateTableModal = ({
   visible,
@@ -69,21 +73,29 @@ const CreateTableModal = ({
     <CenterModal visible={visible} onClose={handleClose}>
       <Text style={styles.title}>Nueva mesa</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder='Código (ej: 1A)'
-        placeholderTextColor={COLORS.common.gris_medio}
-        value={code}
-        onChangeText={setCode}
-        autoCapitalize='characters'
-      />
-      <TextInput
-        style={styles.input}
-        placeholder='Área (opcional)'
-        placeholderTextColor={COLORS.common.gris_medio}
-        value={area}
-        onChangeText={setArea}
-      />
+      <View>
+        <TextInput
+          style={styles.input}
+          placeholder='Código (ej: 1A)'
+          placeholderTextColor={COLORS.common.gris_medio}
+          value={code}
+          onChangeText={setCode}
+          maxLength={CODE_MAX}
+          autoCapitalize='characters'
+        />
+        <Text style={styles.counter}>{code.length}/{CODE_MAX}</Text>
+      </View>
+      <View>
+        <TextInput
+          style={styles.input}
+          placeholder='Área (opcional)'
+          placeholderTextColor={COLORS.common.gris_medio}
+          value={area}
+          onChangeText={setArea}
+          maxLength={AREA_MAX}
+        />
+        <Text style={styles.counter}>{area.length}/{AREA_MAX}</Text>
+      </View>
       <TextInput
         style={styles.input}
         placeholder='Capacidad (personas)'
@@ -111,6 +123,12 @@ const styles = StyleSheet.create({
     color: COLORS.common.negro_principal,
   },
   input: modalInputStyle,
+  counter: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_medio,
+    textAlign: 'right',
+    marginTop: SPACING.small,
+  },
 });
 
 export default CreateTableModal;
