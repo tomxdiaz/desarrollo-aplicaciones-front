@@ -74,9 +74,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const addProduct = useCallback((product: Product) => {
     setItems((previousItems) => {
-      const existingItem = previousItems.find((item) => item.productId === product.id);
-
-      if (existingItem) {
+      if (previousItems.some((item) => item.productId === product.id)) {
         return previousItems.map((item) =>
           item.productId === product.id
             ? {
@@ -116,24 +114,13 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const decrementProduct = useCallback((productId: number) => {
     setItems((previousItems) => {
-      const matchingItem = previousItems.find((item) => item.productId === productId);
-
-      if (!matchingItem) {
+      if (!previousItems.some((item) => item.productId === productId)) {
         return previousItems;
       }
 
-      if (matchingItem.quantity <= 1) {
-        return previousItems.filter((item) => item.productId !== productId);
-      }
-
-      return previousItems.map((item) =>
-        item.productId === productId
-          ? {
-              ...item,
-              quantity: item.quantity - 1,
-            }
-          : item,
-      );
+      return previousItems
+        .map((item) => (item.productId === productId ? { ...item, quantity: item.quantity - 1 } : item))
+        .filter((item) => item.quantity > 0);
     });
   }, []);
 
