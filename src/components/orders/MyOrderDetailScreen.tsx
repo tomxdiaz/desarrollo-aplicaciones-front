@@ -7,7 +7,7 @@ import { COLORS } from '../../constants/colors';
 import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import OrderItemCard from './OrderItemCard';
-import { Order } from '../../types/order.types';
+import { Order, PAYMENT_METHOD_LABELS } from '../../types/order.types';
 
 const STATUS_LABELS: Record<Order['status'], string> = {
   PENDING: 'Pendiente',
@@ -122,6 +122,7 @@ const MyOrderDetailScreen = ({ id, restaurantId }: { id: string; restaurantId: s
           <Text style={[styles.statusText, { color: STATUS_COLORS[order.status] }]}>{STATUS_LABELS[order.status]}</Text>
         </View>
         <Text style={styles.dateText}>{formattedDate}</Text>
+        <Text style={styles.paymentMethodText}>{PAYMENT_METHOD_LABELS[order.payment_method]}</Text>
       </View>
 
       {order.status === 'PENDING' && (
@@ -192,6 +193,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   dateText: {
+    color: COLORS.common.gris_oscuro,
+    fontSize: FONT_SIZES.text_base,
+  },
+  paymentMethodText: {
     color: COLORS.common.gris_oscuro,
     fontSize: FONT_SIZES.text_base,
   },

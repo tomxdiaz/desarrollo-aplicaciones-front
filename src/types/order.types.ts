@@ -1,5 +1,13 @@
 export type OrderStatus = 'PENDING' | 'IN_PROCESS' | 'DELIVERED' | 'CANCELLED';
 
+export type PaymentMethod = 'CASH' | 'CARD' | 'WALLET';
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  CASH: 'Efectivo',
+  CARD: 'Tarjeta',
+  WALLET: 'Billetera virtual',
+};
+
 export type OrderItem = {
   id: number;
   order_id: number;
@@ -19,6 +27,7 @@ export type Order = {
   user_id: string;
   number: number;
   status: OrderStatus;
+  payment_method: PaymentMethod;
   total: number;
   created_at: string;
   items?: OrderItem[];
@@ -28,6 +37,7 @@ export type Order = {
 export type CreateOrderPayload = {
   table_code: string;
   items: CreateOrderItemPayload[];
+  payment_method: PaymentMethod;
   note?: string;
 };
 

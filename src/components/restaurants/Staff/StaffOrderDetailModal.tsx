@@ -6,7 +6,7 @@ import { BORDER_RADIUS, SPACING } from '../../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../../constants/font_sizes';
 import { formatPrice } from '../../../utils/menu';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../../types/restaurant-order-status';
-import { Order, OrderStatus } from '../../../types/order.types';
+import { Order, OrderStatus, PAYMENT_METHOD_LABELS } from '../../../types/order.types';
 import { RestaurantTable } from '../../../types/types';
 
 const formatDateTime = (createdAt: string) =>
@@ -56,11 +56,14 @@ const StaffOrderDetailModal = ({
                 onClose={onClose}
               />
 
-              <View style={[styles.statusChip, { backgroundColor: `${statusColor}1A` }]}>
-                <View style={[styles.dot, { backgroundColor: statusColor }]} />
-                <Text style={[styles.statusText, { color: statusColor }]}>
-                  {RESTAURANT_ORDER_STATUS_LABELS[order.status]}
-                </Text>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusChip, { backgroundColor: `${statusColor}1A` }]}>
+                  <View style={[styles.dot, { backgroundColor: statusColor }]} />
+                  <Text style={[styles.statusText, { color: statusColor }]}>
+                    {RESTAURANT_ORDER_STATUS_LABELS[order.status]}
+                  </Text>
+                </View>
+                <Text style={styles.paymentMethodText}>{PAYMENT_METHOD_LABELS[order.payment_method]}</Text>
               </View>
 
               <ScrollView style={styles.itemsScroll} contentContainerStyle={styles.itemsList} showsVerticalScrollIndicator={false}>
@@ -118,6 +121,11 @@ const StaffOrderDetailModal = ({
 };
 
 const styles = StyleSheet.create({
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   statusChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -126,6 +134,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.medium,
     paddingVertical: SPACING.small,
     borderRadius: BORDER_RADIUS.extra_large,
+  },
+  paymentMethodText: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_oscuro,
   },
   dot: {
     width: 9,

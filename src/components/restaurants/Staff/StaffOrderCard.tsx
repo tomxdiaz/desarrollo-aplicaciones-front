@@ -6,7 +6,7 @@ import { FONT_SIZES } from '../../../constants/font_sizes';
 import { ICON_SIZES } from '../../../constants/icon_sizes';
 import { formatPrice } from '../../../utils/menu';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../../types/restaurant-order-status';
-import { Order, OrderStatus } from '../../../types/order.types';
+import { Order, OrderStatus, PAYMENT_METHOD_LABELS } from '../../../types/order.types';
 import { RestaurantTable } from '../../../types/types';
 
 const formatElapsed = (createdAt: string) => {
@@ -67,6 +67,7 @@ const StaffOrderCard = ({
           <Ionicons name='time-outline' size={ICON_SIZES.extra_small} color={COLORS.common.gris_medio} />
           <Text style={styles.elapsed}>{formatElapsed(order.created_at)}</Text>
         </View>
+        <Text style={styles.paymentMethod}>{PAYMENT_METHOD_LABELS[order.payment_method]}</Text>
         <Text style={styles.total}>{formatPrice(order.total)}</Text>
       </View>
 
@@ -168,6 +169,10 @@ const styles = StyleSheet.create({
     gap: SPACING.extra_small,
   },
   elapsed: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_medio,
+  },
+  paymentMethod: {
     fontSize: FONT_SIZES.text_small,
     color: COLORS.common.gris_medio,
   },

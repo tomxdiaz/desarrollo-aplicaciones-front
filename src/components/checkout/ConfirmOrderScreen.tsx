@@ -11,18 +11,17 @@ import { BORDER_RADIUS, SPACING } from '../../constants/spacing_and_borders';
 import { FONT_SIZES } from '../../constants/font_sizes';
 import { ICON_SIZES } from '../../constants/icon_sizes';
 import { formatPrice } from '../../utils/menu';
-
-type PaymentMethod = 'efectivo' | 'tarjeta' | 'billetera';
+import type { PaymentMethod } from '../../types/order.types';
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; label: string }[] = [
-  { value: 'efectivo', label: 'Efectivo' },
-  { value: 'tarjeta', label: 'Tarjeta' },
-  { value: 'billetera', label: 'Billetera virtual' },
+  { value: 'CASH', label: 'Efectivo' },
+  { value: 'CARD', label: 'Tarjeta' },
+  { value: 'WALLET', label: 'Billetera virtual' },
 ];
 
 const ConfirmOrderScreen = () => {
   const { session, items, cartTotal, clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('efectivo');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -43,6 +42,7 @@ const ConfirmOrderScreen = () => {
           product_id: item.productId,
           quantity: item.quantity,
         })),
+        payment_method: paymentMethod,
       });
       clearCart();
       router.replace('/(checkout)/success');

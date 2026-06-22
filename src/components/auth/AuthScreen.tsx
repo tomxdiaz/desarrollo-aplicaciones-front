@@ -112,7 +112,7 @@ export default function AuthScreen({
         </View>
       </View>
 
-      <StatusBar style='auto' />
+      <StatusBar style='light' backgroundColor='#000000' />
     </KeyboardAwareScrollView>
   );
 }

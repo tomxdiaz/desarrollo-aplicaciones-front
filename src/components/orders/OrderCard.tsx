@@ -4,7 +4,7 @@ import { FONT_SIZES } from '../../constants/font_sizes';
 import { COLORS } from '../../constants/colors';
 import { router } from 'expo-router';
 import { getRestaurantOrderStatusStyle, RESTAURANT_ORDER_STATUS_LABELS } from '../../types/restaurant-order-status';
-import { Order } from '../../types/order.types';
+import { Order, PAYMENT_METHOD_LABELS } from '../../types/order.types';
 
 const OrderCard = ({ order, onCancel }: { order: Order; onCancel?: (order: Order) => void }) => {
   const handlePress = () => {
@@ -30,7 +30,10 @@ const OrderCard = ({ order, onCancel }: { order: Order; onCancel?: (order: Order
           </Pressable>
         </View>
       </View>
-      <Text style={styles.date}>{new Date(order.created_at).toLocaleDateString('es-AR')}</Text>
+      <View style={styles.bottomRow}>
+        <Text style={styles.date}>{new Date(order.created_at).toLocaleDateString('es-AR')}</Text>
+        <Text style={styles.paymentMethod}>{PAYMENT_METHOD_LABELS[order.payment_method]}</Text>
+      </View>
     </View>
   );
 };
@@ -110,10 +113,19 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.text_small,
     fontWeight: '700',
   },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: SPACING.small,
+  },
   date: {
     fontSize: FONT_SIZES.text_small,
     color: COLORS.common.gris_medio,
-    marginTop: SPACING.small,
+  },
+  paymentMethod: {
+    fontSize: FONT_SIZES.text_small,
+    color: COLORS.common.gris_medio,
   },
 });
 

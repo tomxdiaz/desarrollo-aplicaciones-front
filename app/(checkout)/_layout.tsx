@@ -1,4 +1,5 @@
 import { Redirect, Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '../../src/providers/auth.provider';
 
 export default function CheckoutLayout() {
@@ -9,6 +10,9 @@ export default function CheckoutLayout() {
   }
 
   return (
-    <Stack screenOptions={{ animation: 'slide_from_right', headerShown: false }} />
+    <>
+      <StatusBar style="light" backgroundColor="#000000" />
+      <Stack screenOptions={{ animation: 'slide_from_right', headerShown: false }} />
+    </>
   );
 }
